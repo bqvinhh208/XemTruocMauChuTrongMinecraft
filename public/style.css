@@ -1,8 +1,3 @@
-/* =========================================================
-   Minecraft Color Preview — Compact Professional UI
-   Modern glassmorphism · Minecraft atmosphere
-   ========================================================= */
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=VT323&display=swap');
 
 @font-face {
@@ -24,7 +19,6 @@
   font-style: italic;
 }
 
-/* ── Reset ──────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -52,7 +46,6 @@
   --r-lg:   16px;
 }
 
-/* ── Base ────────────────────────────────────────────────── */
 html { font-size: 16px; scroll-behavior: smooth; }
 body {
   background: var(--bg);
@@ -76,7 +69,6 @@ body {
   padding-top: 1rem;
 }
 
-/* ── Card ────────────────────────────────────────────────── */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -88,7 +80,6 @@ body {
 }
 .card:hover { border-color: var(--border-2); }
 
-/* ── Header ─────────────────────────────────────────────── */
 header {
   display: flex;
   align-items: center;
@@ -124,9 +115,6 @@ header {
   background: #4752C4; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(88,101,242,0.4); color: #fff;
 }
 
-/* ══════════════════════════════════════════════════════════
-   COMPACT EDITOR UI
-   ══════════════════════════════════════════════════════════ */
 .compact-section {
   padding: 1rem 1.25rem;
   display: flex;
@@ -159,7 +147,6 @@ header {
   margin-bottom: 0;
 }
 
-/* Row 1: Text input & Formats */
 .input-row {
   display: flex;
   gap: 0.75rem;
@@ -200,7 +187,6 @@ header {
   background: var(--accent-dim); border-color: rgba(99,179,237,0.4); color: var(--accent);
 }
 
-/* Row 2: Colors */
 .color-row { display: flex; flex-direction: column; gap: 0.6rem; }
 .color-controls { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
 .sub-label { font-size: 0.75rem; color: var(--text-2); font-weight: 500; margin-right: 0.2rem; }
@@ -242,7 +228,6 @@ header {
   border: 1px solid rgba(255,255,255,0.1); margin-top: 0.2rem;
 }
 
-/* Row 3: Raw Output/Input */
 .modern-select {
   background: rgba(0,0,0,0.3); border: 1px solid var(--border);
   color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
@@ -261,7 +246,6 @@ header {
 
 .action-row { display: flex; gap: 0.5rem; align-items: center; }
 
-/* Buttons */
 .btn {
   padding: 0.45rem 1rem; border: 1px solid transparent; border-radius: var(--r-sm);
   font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.15s;
@@ -276,7 +260,6 @@ header {
 .btn-secondary { background: var(--surface-hover); color: var(--text-2); border-color: var(--border-2); }
 .btn-secondary:hover { background: rgba(255,255,255,0.12); color: var(--text); }
 
-/* ── Preview Container ───────────────────────────────────── */
 .preview-section { position: relative; overflow: hidden; }
 .preview-bg {
   position: absolute; inset: 0;
@@ -320,7 +303,6 @@ header {
 .obfuscated { display: inline-block; }
 .placeholder { background: rgba(252,129,129,0.1); border: 1px dashed rgba(252,129,129,0.35); border-radius: 3px; padding: 0 3px; text-shadow: none; }
 
-/* ── Examples section ───────────────────────────────────── */
 .examples-section { padding: 1.1rem; }
 .section-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.8rem; }
 .section-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-2); }
@@ -336,7 +318,6 @@ header {
   overflow: hidden; white-space: pre-wrap; text-overflow: clip; line-height: 1.6; text-shadow: 1px 1px 2px #000;
 }
 
-/* ── Reference section ──────────────────────────────────── */
 .reference-section { padding: 1.1rem; }
 .tabs {
   display: inline-flex; gap: 0.2rem; background: rgba(0,0,0,0.25); padding: 0.25rem;
@@ -377,13 +358,11 @@ code { background: rgba(0,0,0,0.35); padding: 1px 6px; border-radius: 4px; font-
 }
 .insert-btn:hover { background: var(--accent-dim); border-color: rgba(99,179,237,0.45); }
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
-/* Responsive */
 @media (max-width: 640px) {
   .logo-title { font-size: 1.1rem; }
   .examples-grid, .color-grid { grid-template-columns: 1fr 1fr; }

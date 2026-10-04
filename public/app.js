@@ -1,13 +1,9 @@
-// ─────────────────────────────────────────────────────────
-//  App logic — Compact UI Fix
-// ─────────────────────────────────────────────────────────
-
 const AppState = {
   text: "Minecraft Color",
   stops: ['#ff0000', '#ffaa00', '#00ff88'],
   fmt: { b: false, i: false, u: false, s: false },
-  outFormat: 'hex', // hex | minimessage | legacy
-  isManual: false,  // If user types raw code, we stop auto-generating from gradient
+  outFormat: 'hex', 
+  isManual: false,  
 };
 
 const DOM = {
@@ -16,7 +12,7 @@ const DOM = {
   fmtI: document.getElementById('fmtI'),
   fmtU: document.getElementById('fmtU'),
   fmtS: document.getElementById('fmtS'),
-  
+
   btnAdd: document.getElementById('btnAddColor'),
   btnRem: document.getElementById('btnRemoveColor'),
   btnRand: document.getElementById('btnRandomColors'),
@@ -33,7 +29,6 @@ const DOM = {
   previewContainer: document.getElementById('previewContainer')
 };
 
-// ── Helpers ───────────────────────────────────────────
 function hexToRgb(h) {
   const c = h.replace('#','');
   return { r: parseInt(c.slice(0,2),16), g: parseInt(c.slice(2,4),16), b: parseInt(c.slice(4,6),16) };
@@ -62,7 +57,6 @@ function getGradientColors(count) {
   return res;
 }
 
-// ── Render UI ─────────────────────────────────────────
 function renderStops() {
   DOM.stopsContainer.innerHTML = '';
   AppState.stops.forEach((hex, i) => {
@@ -78,23 +72,21 @@ function renderStops() {
     DOM.stopsContainer.appendChild(el);
   });
 
-  // CRITICAL FIX: Only update the visual styling, DO NOT call renderStops() on input
   DOM.stopsContainer.querySelectorAll('input[type="color"]').forEach(inp => {
     inp.addEventListener('input', e => {
       const idx = +e.target.dataset.idx;
       const val = e.target.value;
       AppState.stops[idx] = val;
       AppState.isManual = false;
-      
-      // Update DOM visually without re-rendering entire list (which closes color picker)
+
       e.target.previousElementSibling.style.background = val;
       e.target.closest('.color-stop-item').querySelector('.color-stop-hex').value = val.toUpperCase();
       DOM.gradientBar.style.background = `linear-gradient(90deg, ${AppState.stops.join(', ')})`;
-      
+
       updateAll();
     });
   });
-  
+
   DOM.stopsContainer.querySelectorAll('.color-stop-hex').forEach(inp => {
     inp.addEventListener('change', e => {
       let val = e.target.value.trim();
@@ -103,22 +95,20 @@ function renderStops() {
         const idx = +e.target.dataset.idx;
         AppState.stops[idx] = val;
         AppState.isManual = false;
-        
-        // Update color picker value and swatch
+
         const parent = e.target.closest('.color-stop-item');
         parent.querySelector('input[type="color"]').value = val;
         parent.querySelector('.swatch-bg').style.background = val;
         DOM.gradientBar.style.background = `linear-gradient(90deg, ${AppState.stops.join(', ')})`;
-        
+
         updateAll();
       }
     });
   });
-  
+
   DOM.gradientBar.style.background = `linear-gradient(90deg, ${AppState.stops.join(', ')})`;
 }
 
-// ── Build Codes ───────────────────────────────────────
 function getLegacyFmt() {
   let s = '';
   if (AppState.fmt.b) s += '&l';
@@ -159,7 +149,6 @@ function buildCode() {
   return '';
 }
 
-// ── Core Updates ──────────────────────────────────────
 let obfTimer = null;
 function updatePreview() {
   const code = DOM.rawInput.value;
@@ -171,7 +160,6 @@ function updatePreview() {
     return line ? `<div class="mc-line">${MinecraftParser.parse(line)}</div>` : '<br>';
   }).join('');
 
-  // Anim obf
   clearInterval(obfTimer);
   obfTimer = setInterval(() => {
     document.querySelectorAll('.obfuscated').forEach(el => {
@@ -199,7 +187,6 @@ function updateAll() {
   autoResizeInput();
 }
 
-// ── Events ────────────────────────────────────────────
 DOM.plainText.addEventListener('input', e => {
   AppState.text = e.target.value;
   AppState.isManual = false;
@@ -216,12 +203,12 @@ DOM.plainText.addEventListener('input', e => {
 
 DOM.formatSelect.addEventListener('change', e => {
   AppState.outFormat = e.target.value;
-  AppState.isManual = false; // re-gen code
+  AppState.isManual = false; 
   updateAll();
 });
 
 DOM.rawInput.addEventListener('input', () => {
-  AppState.isManual = true; // user is typing raw code
+  AppState.isManual = true; 
   updatePreview();
   autoResizeInput();
 });
@@ -266,7 +253,6 @@ DOM.clearBtn.addEventListener('click', () => {
   updateAll();
 });
 
-// Bg Switcher
 DOM.bgBtns.forEach(btn => {
   btn.addEventListener('click', () => {
     DOM.bgBtns.forEach(b => b.classList.remove('active'));
@@ -275,20 +261,18 @@ DOM.bgBtns.forEach(btn => {
   });
 });
 
-// Example cards
 document.querySelectorAll('.example-card').forEach(card => {
   const text = card.dataset.text;
   card.querySelector('.example-preview').innerHTML = MinecraftParser.parse(text);
   card.addEventListener('click', () => {
     DOM.rawInput.value = text;
-    AppState.isManual = true; // Override gradient builder
+    AppState.isManual = true; 
     updatePreview();
     autoResizeInput();
     DOM.rawInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 });
 
-// Reference tables
 function initTables() {
   const leg = document.getElementById('legacyGrid');
   if(leg) {
@@ -355,7 +339,6 @@ function insertRaw(code) {
   });
 }
 
-// Tabs
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -365,13 +348,10 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
-// Boot
 renderStops();
 updateAll();
 initTables();
 
-
-// Text Transform Tools
 document.getElementById('btnUpper')?.addEventListener('click', () => {
   const i = document.getElementById('plainText');
   i.value = i.value.toUpperCase();
@@ -388,11 +368,9 @@ document.getElementById('btnTitle')?.addEventListener('click', () => {
   i.dispatchEvent(new Event('input'));
 });
 
-// Font Switcher
 document.getElementById('fontSelect')?.addEventListener('change', e => {
   const box = document.getElementById('previewBox');
   if (box) {
     box.className = 'minecraft-preview preview-font-' + e.target.value;
   }
 });
-

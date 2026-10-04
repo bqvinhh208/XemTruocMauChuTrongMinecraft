@@ -8,7 +8,7 @@
 </head>
 <body>
   <div class="container">
-    <!-- Header -->
+
     <header>
       <div class="logo-wrap">
         <div class="logo-icon">🎨</div>
@@ -22,13 +22,12 @@
       </a>
     </header>
 
-    <!-- 1. Text & Gradient Settings -->
     <div class="card compact-section">
       <div class="section-label">1. Văn bản & Tạo Gradient</div>
-      
+
       <div class="input-row">
         <input type="text" id="plainText" class="modern-input" placeholder="Nhập văn bản thường để tự động tạo gradient..." value="Minecraft Color" />
-        
+
         <div class="format-toggles">
           <label class="toggle-btn" title="Bold"><input type="checkbox" id="fmtB"><span>B</span></label>
           <label class="toggle-btn" title="Italic"><input type="checkbox" id="fmtI"><span>I</span></label>
@@ -36,7 +35,7 @@
           <label class="toggle-btn" title="Strikethrough"><input type="checkbox" id="fmtS"><span style="text-decoration:line-through">S</span></label>
         </div>
       </div>
-      
+
       <div class="text-tools">
         <button id="btnUpper" class="tool-btn" title="VIẾT HOA TOÀN BỘ">AA</button>
         <button id="btnLower" class="tool-btn" title="viết thường toàn bộ">aa</button>
@@ -51,13 +50,12 @@
           <button class="icon-btn random" id="btnRandomColors" title="Màu ngẫu nhiên">🎲 Random</button>
         </div>
         <div id="colorStops" class="stops-container">
-          <!-- JS injected -->
+
         </div>
         <div id="gradientBar" class="gradient-bar"></div>
       </div>
     </div>
 
-    <!-- 2. Raw Code & Format -->
     <div class="card compact-section">
       <div class="section-header-flex">
         <div class="section-label">2. Mã màu (Copy hoặc tự chỉnh sửa)</div>
@@ -67,16 +65,15 @@
           <option value="legacy">Legacy (&amp;x...)</option>
         </select>
       </div>
-      
+
       <textarea id="rawInput" class="modern-textarea" rows="3" placeholder="Mã màu sẽ hiện ở đây. Bạn cũng có thể tự dán mã màu Minecraft vào ô này để xem trước..."></textarea>
-      
+
       <div class="action-row">
         <button id="copyBtn" class="btn btn-primary">📋 Copy Mã</button>
         <button id="clearBtn" class="btn btn-secondary">✕ Xoá</button>
       </div>
     </div>
 
-    <!-- 3. Preview -->
     <div class="card preview-section bg-dark" id="previewContainer">
       <div class="preview-header" style="display:flex; justify-content:space-between; align-items:center;">
         <span class="preview-title"><span class="pulse-dot"></span> XEM TRƯỚC</span>
@@ -99,8 +96,6 @@
       </div>
     </div>
 
-
-    <!-- Quick examples -->
     <div class="examples-section card">
       <div class="section-title">⚡ Ví dụ nhanh</div>
       <div class="examples-grid">
@@ -125,7 +120,6 @@
       </div>
     </div>
 
-    <!-- Reference table -->
     <div class="reference-section card">
       <div class="section-title">📋 Bảng mã màu</div>
       <div class="tabs">
