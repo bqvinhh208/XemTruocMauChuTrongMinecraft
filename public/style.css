@@ -7,15 +7,21 @@
 
 @font-face {
   font-family: 'Minecraft';
-  src: url('https://birdflop.com/fonts/MinecraftRegular.woff') format('woff');
+  src: url('fonts/MinecraftRegular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
 @font-face {
   font-family: 'Minecraft';
-  src: url('https://birdflop.com/fonts/MinecraftBold.woff') format('woff');
+  src: url('fonts/MinecraftBold.woff') format('woff');
   font-weight: bold;
   font-style: normal;
+}
+@font-face {
+  font-family: 'Minecraft';
+  src: url('fonts/MinecraftItalic.woff') format('woff');
+  font-weight: normal;
+  font-style: italic;
 }
 
 /* ── Reset ──────────────────────────────────────────────── */
