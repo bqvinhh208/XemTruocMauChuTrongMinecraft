@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────
-//  App logic — Compact UI
+//  App logic — Compact UI Fix
 // ─────────────────────────────────────────────────────────
 
 const AppState = {
@@ -70,7 +70,7 @@ function renderStops() {
     el.className = 'color-stop-item';
     el.innerHTML = `
       <div class="color-stop-swatch">
-        <div style="width:100%;height:100%;background:${hex};pointer-events:none"></div>
+        <div class="swatch-bg" style="width:100%;height:100%;background:${hex};pointer-events:none"></div>
         <input type="color" value="${hex}" data-idx="${i}">
       </div>
       <input type="text" class="color-stop-hex" value="${hex.toUpperCase()}" data-idx="${i}" maxlength="7" spellcheck="false">
@@ -78,21 +78,39 @@ function renderStops() {
     DOM.stopsContainer.appendChild(el);
   });
 
+  // CRITICAL FIX: Only update the visual styling, DO NOT call renderStops() on input
   DOM.stopsContainer.querySelectorAll('input[type="color"]').forEach(inp => {
     inp.addEventListener('input', e => {
-      AppState.stops[+e.target.dataset.idx] = e.target.value;
+      const idx = +e.target.dataset.idx;
+      const val = e.target.value;
+      AppState.stops[idx] = val;
       AppState.isManual = false;
-      renderStops(); updateAll();
+      
+      // Update DOM visually without re-rendering entire list (which closes color picker)
+      e.target.previousElementSibling.style.background = val;
+      e.target.closest('.color-stop-item').querySelector('.color-stop-hex').value = val.toUpperCase();
+      DOM.gradientBar.style.background = `linear-gradient(90deg, ${AppState.stops.join(', ')})`;
+      
+      updateAll();
     });
   });
+  
   DOM.stopsContainer.querySelectorAll('.color-stop-hex').forEach(inp => {
     inp.addEventListener('change', e => {
       let val = e.target.value.trim();
       if(!val.startsWith('#')) val = '#'+val;
       if(/^#[0-9a-fA-F]{6}$/.test(val)) {
-        AppState.stops[+e.target.dataset.idx] = val;
+        const idx = +e.target.dataset.idx;
+        AppState.stops[idx] = val;
         AppState.isManual = false;
-        renderStops(); updateAll();
+        
+        // Update color picker value and swatch
+        const parent = e.target.closest('.color-stop-item');
+        parent.querySelector('input[type="color"]').value = val;
+        parent.querySelector('.swatch-bg').style.background = val;
+        DOM.gradientBar.style.background = `linear-gradient(90deg, ${AppState.stops.join(', ')})`;
+        
+        updateAll();
       }
     });
   });
@@ -262,8 +280,6 @@ document.querySelectorAll('.example-card').forEach(card => {
 });
 
 // Reference tables (build via old functions that we preserve in parser or inline here)
-// ... keeping it simple for the compact version ...
-// Build tables dynamically:
 function initTables() {
   const leg = document.getElementById('legacyGrid');
   if(leg) {
