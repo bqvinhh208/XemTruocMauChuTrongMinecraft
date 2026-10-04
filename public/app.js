@@ -326,14 +326,24 @@ function initTables() {
     fmt.innerHTML = html;
   }
 }
+function showToast(msg) {
+  let t = document.getElementById('toast');
+  if(!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.className = 'toast';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t.timer);
+  t.timer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
 function insertRaw(code) {
-  const i = DOM.rawInput;
-  const start = i.selectionStart;
-  i.value = i.value.slice(0,start) + code + i.value.slice(i.selectionEnd);
-  i.selectionStart = i.selectionEnd = start + code.length;
-  AppState.isManual = true;
-  updatePreview();
-  i.focus();
+  navigator.clipboard.writeText(code).then(() => {
+    showToast('Đã copy: ' + code);
+  });
 }
 
 // Tabs
