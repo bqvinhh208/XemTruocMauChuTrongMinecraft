@@ -279,7 +279,7 @@ document.querySelectorAll('.example-card').forEach(card => {
   });
 });
 
-// Reference tables (build via old functions that we preserve in parser or inline here)
+// Reference tables
 function initTables() {
   const leg = document.getElementById('legacyGrid');
   if(leg) {
@@ -287,6 +287,43 @@ function initTables() {
     const cols = MinecraftParser.LEGACY_COLORS;
     for(let c in cols) html += `<div class="color-chip" onclick="insertRaw('&${c}')"><div class="color-swatch" style="background:${cols[c]}"></div>&amp;${c}</div>`;
     leg.innerHTML = html;
+  }
+
+  const mini = document.getElementById('miniTable');
+  if (mini) {
+    let html = '<table><tr><th>Màu sắc</th><th>Mã MiniMessage</th></tr>';
+    const cols = MinecraftParser.MINI_COLORS;
+    for (let c in cols) {
+      if (['dark_grey', 'grey', 'light_purple'].includes(c)) continue;
+      html += `<tr>
+        <td><div class="color-chip" style="width:fit-content;padding:0.2rem 0.5rem;border:none;background:transparent;cursor:default"><div class="color-swatch" style="background:${cols[c]}"></div><span style="color:${cols[c]}">${c}</span></div></td>
+        <td><code class="insert-btn" onclick="insertRaw('<${c}>')">&lt;${c}&gt;</code></td>
+      </tr>`;
+    }
+    html += '</table>';
+    mini.innerHTML = html;
+  }
+
+  const fmt = document.getElementById('formatTable');
+  if (fmt) {
+    const formats = [
+      { name: 'In đậm (Bold)', leg: '&l', mini: '<bold>', style: 'font-weight:bold' },
+      { name: 'In nghiêng (Italic)', leg: '&o', mini: '<italic>', style: 'font-style:italic' },
+      { name: 'Gạch chân (Underline)', leg: '&n', mini: '<underline>', style: 'text-decoration:underline' },
+      { name: 'Gạch ngang (Strikethrough)', leg: '&m', mini: '<strikethrough>', style: 'text-decoration:line-through' },
+      { name: 'Làm mờ (Obfuscated)', leg: '&k', mini: '<obf>', style: 'opacity:0.8' },
+      { name: 'Mặc định (Reset)', leg: '&r', mini: '<reset>', style: '' }
+    ];
+    let html = '<table><tr><th>Định dạng</th><th>Legacy</th><th>MiniMessage</th></tr>';
+    for (let f of formats) {
+      html += `<tr>
+        <td style="${f.style}">${f.name}</td>
+        <td><code class="insert-btn" onclick="insertRaw('${f.leg}')">${f.leg}</code></td>
+        <td><code class="insert-btn" onclick="insertRaw('${f.mini}')">${f.mini.replace('<','&lt;').replace('>','&gt;')}</code></td>
+      </tr>`;
+    }
+    html += '</table>';
+    fmt.innerHTML = html;
   }
 }
 function insertRaw(code) {

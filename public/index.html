@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🎮 Minecraft Color Preview</title>
+  <title>ðŸŽ® Minecraft Color Preview</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -11,18 +11,18 @@
     <!-- Header -->
     <header>
       <div class="logo-wrap">
-        <div class="logo-icon">🎨</div>
+        <div class="logo-icon">ðŸŽ¨</div>
         <span class="logo-title">MC Color Preview</span>
       </div>
-      <p class="subtitle">Xem trước màu chữ Minecraft · MOD · Plugin · MiniMessage</p>
+      <p class="subtitle">Xem trÆ°á»›c mÃ u chá»¯ Minecraft Â· MOD Â· Plugin Â· MiniMessage</p>
     </header>
 
     <!-- 1. Text & Gradient Settings -->
     <div class="card compact-section">
-      <div class="section-label">1. Văn bản & Tạo Gradient</div>
+      <div class="section-label">1. VÄƒn báº£n & Táº¡o Gradient</div>
       
       <div class="input-row">
-        <input type="text" id="plainText" class="modern-input" placeholder="Nhập văn bản thường để tự động tạo gradient..." value="Minecraft Color" />
+        <input type="text" id="plainText" class="modern-input" placeholder="Nháº­p vÄƒn báº£n thÆ°á»ng Ä‘á»ƒ tá»± Ä‘á»™ng táº¡o gradient..." value="Minecraft Color" />
         
         <div class="format-toggles">
           <label class="toggle-btn" title="Bold"><input type="checkbox" id="fmtB"><span>B</span></label>
@@ -34,10 +34,10 @@
 
       <div class="color-row">
         <div class="color-controls">
-          <span class="sub-label">Dải màu:</span>
-          <button class="icon-btn" id="btnAddColor" title="Thêm màu">+</button>
-          <button class="icon-btn" id="btnRemoveColor" title="Xoá màu">−</button>
-          <button class="icon-btn random" id="btnRandomColors" title="Màu ngẫu nhiên">🎲 Random</button>
+          <span class="sub-label">Dáº£i mÃ u:</span>
+          <button class="icon-btn" id="btnAddColor" title="ThÃªm mÃ u">+</button>
+          <button class="icon-btn" id="btnRemoveColor" title="XoÃ¡ mÃ u">âˆ’</button>
+          <button class="icon-btn random" id="btnRandomColors" title="MÃ u ngáº«u nhiÃªn">ðŸŽ² Random</button>
         </div>
         <div id="colorStops" class="stops-container">
           <!-- JS injected -->
@@ -49,7 +49,7 @@
     <!-- 2. Raw Code & Format -->
     <div class="card compact-section">
       <div class="section-header-flex">
-        <div class="section-label">2. Mã màu (Copy hoặc tự chỉnh sửa)</div>
+        <div class="section-label">2. MÃ£ mÃ u (Copy hoáº·c tá»± chá»‰nh sá»­a)</div>
         <select id="formatSelect" class="modern-select">
           <option value="hex">Bukkit (&#RRGGBB)</option>
           <option value="minimessage">MiniMessage (&lt;gradient&gt;)</option>
@@ -57,51 +57,51 @@
         </select>
       </div>
       
-      <textarea id="rawInput" class="modern-textarea" rows="3" placeholder="Mã màu sẽ hiện ở đây. Bạn cũng có thể tự dán mã màu Minecraft vào ô này để xem trước..."></textarea>
+      <textarea id="rawInput" class="modern-textarea" rows="3" placeholder="MÃ£ mÃ u sáº½ hiá»‡n á»Ÿ Ä‘Ã¢y. Báº¡n cÅ©ng cÃ³ thá»ƒ tá»± dÃ¡n mÃ£ mÃ u Minecraft vÃ o Ã´ nÃ y Ä‘á»ƒ xem trÆ°á»›c..."></textarea>
       
       <div class="action-row">
-        <button id="copyBtn" class="btn btn-primary">📋 Copy Mã</button>
-        <button id="clearBtn" class="btn btn-secondary">✕ Xoá</button>
+        <button id="copyBtn" class="btn btn-primary">ðŸ“‹ Copy MÃ£</button>
+        <button id="clearBtn" class="btn btn-secondary">âœ• XoÃ¡</button>
       </div>
     </div>
 
     <!-- 3. Preview -->
     <div class="card preview-section bg-dark" id="previewContainer">
       <div class="preview-header">
-        <span class="preview-title"><span class="pulse-dot"></span> XEM TRƯỚC</span>
+        <span class="preview-title"><span class="pulse-dot"></span> XEM TRÆ¯á»šC</span>
         <div class="bg-switcher">
-          <button class="bg-btn active" data-bg="dark">⬛</button>
-          <button class="bg-btn" data-bg="light">⬜</button>
-          <button class="bg-btn" data-bg="grass">🌿</button>
+          <button class="bg-btn active" data-bg="dark">â¬›</button>
+          <button class="bg-btn" data-bg="light">â¬œ</button>
+          <button class="bg-btn" data-bg="grass">ðŸŒ¿</button>
         </div>
       </div>
       <div class="preview-bg"></div>
       <div class="minecraft-preview" id="previewBox">
-        <span class="placeholder-text">Đang đợi nội dung...</span>
+        <span class="placeholder-text">Äang Ä‘á»£i ná»™i dung...</span>
       </div>
     </div>
 
 
     <!-- Quick examples -->
     <div class="examples-section card">
-      <div class="section-title">⚡ Ví dụ nhanh</div>
+      <div class="section-title">âš¡ VÃ­ dá»¥ nhanh</div>
       <div class="examples-grid">
-        <div class="example-card" data-text="<gradient:#ff9900:#ff0000>Ăn xong miếng bánh hết bà thanh xuân</gradient>&#10;<gradient:#00ff00:#0099ff>Đến khi ngoảnh lại tần ngần</gradient>&#10;<gradient:#ff00ff:#9900ff>Thanh xuân đi mất, tăng cân vèo vèo</gradient>">
+        <div class="example-card" data-text="<gradient:#ff9900:#ff0000>Ä‚n xong miáº¿ng bÃ¡nh háº¿t bÃ  thanh xuÃ¢n</gradient>&#10;<gradient:#00ff00:#0099ff>Äáº¿n khi ngoáº£nh láº¡i táº§n ngáº§n</gradient>&#10;<gradient:#ff00ff:#9900ff>Thanh xuÃ¢n Ä‘i máº¥t, tÄƒng cÃ¢n vÃ¨o vÃ¨o</gradient>">
           <div class="example-preview"></div>
         </div>
-        <div class="example-card" data-text="<gradient:#00ffff:#0000ff>Trăm năm trong cõi người ta</gradient>&#10;<gradient:#ff00ff:#ff0000>Chữ tài chữ mệnh khéo là ghét nhau</gradient>">
+        <div class="example-card" data-text="<gradient:#00ffff:#0000ff>TrÄƒm nÄƒm trong cÃµi ngÆ°á»i ta</gradient>&#10;<gradient:#ff00ff:#ff0000>Chá»¯ tÃ i chá»¯ má»‡nh khÃ©o lÃ  ghÃ©t nhau</gradient>">
           <div class="example-preview"></div>
         </div>
-        <div class="example-card" data-text="&#FF0000&lCẢNH BÁO&#10;&fBạn đang bước vào khu vực nguy hiểm&#10;&eHãy cẩn thận với Creeper!">
+        <div class="example-card" data-text="&#FF0000&lCáº¢NH BÃO&#10;&fBáº¡n Ä‘ang bÆ°á»›c vÃ o khu vá»±c nguy hiá»ƒm&#10;&eHÃ£y cáº©n tháº­n vá»›i Creeper!">
           <div class="example-preview"></div>
         </div>
-        <div class="example-card" data-text="<rainbow>Những điều trông thấy mà đau đớn lòng</rainbow>&#10;<rainbow>Lạ gì bỉ sắc tư phong</rainbow>&#10;<rainbow>Trời xanh quen thói má hồng đánh ghen</rainbow>">
+        <div class="example-card" data-text="<rainbow>Nhá»¯ng Ä‘iá»u trÃ´ng tháº¥y mÃ  Ä‘au Ä‘á»›n lÃ²ng</rainbow>&#10;<rainbow>Láº¡ gÃ¬ bá»‰ sáº¯c tÆ° phong</rainbow>&#10;<rainbow>Trá»i xanh quen thÃ³i mÃ¡ há»“ng Ä‘Ã¡nh ghen</rainbow>">
           <div class="example-preview"></div>
         </div>
-        <div class="example-card" data-text="&a&lServer Information&#10;&8» &7IP: &fmcs.example.com&#10;&8» &7Online: &a124&8/&a500">
+        <div class="example-card" data-text="&a&lServer Information&#10;&8Â» &7IP: &fmcs.example.com&#10;&8Â» &7Online: &a124&8/&a500">
           <div class="example-preview"></div>
         </div>
-        <div class="example-card" data-text="&8[&b&lHỆ THỐNG&8] &7Chào mừng &aPlayer &7đến server!&#10;&8[&b&lHỆ THỐNG&8] &7Nhập &e/help &7để xem hướng dẫn.">
+        <div class="example-card" data-text="&8[&b&lHá»† THá»NG&8] &7ChÃ o má»«ng &aPlayer &7Ä‘áº¿n server!&#10;&8[&b&lHá»† THá»NG&8] &7Nháº­p &e/help &7Ä‘á»ƒ xem hÆ°á»›ng dáº«n.">
           <div class="example-preview"></div>
         </div>
       </div>
@@ -109,11 +109,11 @@
 
     <!-- Reference table -->
     <div class="reference-section card">
-      <div class="section-title">📋 Bảng mã màu</div>
+      <div class="section-title">ðŸ“‹ Báº£ng mÃ£ mÃ u</div>
       <div class="tabs">
-        <button class="tab active" data-tab="legacy">Legacy &amp;codes</button>
+        <button class="tab active" data-tab="legacy">Legacy</button>
         <button class="tab" data-tab="minimessage">MiniMessage</button>
-        <button class="tab" data-tab="formats">Format codes</button>
+        <button class="tab" data-tab="formats">Format</button>
       </div>
       <div class="tab-content active" id="tab-legacy">
         <div class="color-grid" id="legacyGrid"></div>
