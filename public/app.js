@@ -1,196 +1,289 @@
 // ─────────────────────────────────────────────────────────
-//  App logic — UI interactions
+//  App logic — Compact UI
 // ─────────────────────────────────────────────────────────
 
-const input  = document.getElementById('colorInput');
-const preview = document.getElementById('previewBox');
-const previewBtn = document.getElementById('previewBtn');
-const clearBtn   = document.getElementById('clearBtn');
-const copyBtn    = document.getElementById('copyBtn');
+const AppState = {
+  text: "Minecraft Color",
+  stops: ['#ff0000', '#ffaa00', '#00ff88'],
+  fmt: { b: false, i: false, u: false, s: false },
+  outFormat: 'hex', // hex | minimessage | legacy
+  isManual: false,  // If user types raw code, we stop auto-generating from gradient
+};
 
-// ── Preview on button or Ctrl+Enter ──────────────────────
-previewBtn.addEventListener('click', doPreview);
-input.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && e.ctrlKey) doPreview();
-});
+const DOM = {
+  plainText: document.getElementById('plainText'),
+  fmtB: document.getElementById('fmtB'),
+  fmtI: document.getElementById('fmtI'),
+  fmtU: document.getElementById('fmtU'),
+  fmtS: document.getElementById('fmtS'),
+  
+  btnAdd: document.getElementById('btnAddColor'),
+  btnRem: document.getElementById('btnRemoveColor'),
+  btnRand: document.getElementById('btnRandomColors'),
+  stopsContainer: document.getElementById('colorStops'),
+  gradientBar: document.getElementById('gradientBar'),
 
-// Live preview with debounce
-let debounceTimer = null;
-input.addEventListener('input', () => {
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(doPreview, 300);
-});
+  formatSelect: document.getElementById('formatSelect'),
+  rawInput: document.getElementById('rawInput'),
+  copyBtn: document.getElementById('copyBtn'),
+  clearBtn: document.getElementById('clearBtn'),
 
-function doPreview() {
-  const text = input.value;
-  if (!text.trim()) {
-    preview.innerHTML = '<span class="placeholder-text">Nhập text phía trên để xem preview...</span>';
-    return;
+  previewBox: document.getElementById('previewBox'),
+  bgBtns: document.querySelectorAll('.bg-btn'),
+  previewContainer: document.getElementById('previewContainer')
+};
+
+// ── Helpers ───────────────────────────────────────────
+function hexToRgb(h) {
+  const c = h.replace('#','');
+  return { r: parseInt(c.slice(0,2),16), g: parseInt(c.slice(2,4),16), b: parseInt(c.slice(4,6),16) };
+}
+function rgbToHex({r,g,b}) {
+  return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
+}
+function lerp(a, b, t) {
+  return {
+    r: Math.round(a.r + (b.r - a.r) * t),
+    g: Math.round(a.g + (b.g - a.g) * t),
+    b: Math.round(a.b + (b.b - a.b) * t),
+  };
+}
+function getGradientColors(count) {
+  if (count <= 0) return [];
+  if (count === 1) return [AppState.stops[0]];
+  const res = [];
+  const segs = AppState.stops.length - 1;
+  for (let i = 0; i < count; i++) {
+    const t = i / (count - 1);
+    const seg = Math.min(Math.floor(t * segs), segs - 1);
+    const tSeg = t * segs - seg;
+    res.push(rgbToHex(lerp(hexToRgb(AppState.stops[seg]), hexToRgb(AppState.stops[seg+1]), tSeg)));
   }
-  const lines = text.split('\n');
-  const html = lines.map(line => {
-    if (line === '') return '<br>';
-    return '<div class="mc-line">' + MinecraftParser.parse(line) + '</div>';
-  }).join('');
-  preview.innerHTML = html;
-
-  // Animate obfuscated text
-  startObfuscation();
+  return res;
 }
 
-// ── Clear ─────────────────────────────────────────────────
-clearBtn.addEventListener('click', () => {
-  input.value = '';
-  preview.innerHTML = '<span class="placeholder-text">Nhập text phía trên để xem preview...</span>';
-  stopObfuscation();
-});
-
-// ── Copy ──────────────────────────────────────────────────
-copyBtn.addEventListener('click', () => {
-  navigator.clipboard.writeText(input.value).then(() => {
-    copyBtn.textContent = '✓ Đã copy!';
-    copyBtn.classList.add('copied');
-    setTimeout(() => {
-      copyBtn.textContent = '📋 Copy';
-      copyBtn.classList.remove('copied');
-    }, 2000);
+// ── Render UI ─────────────────────────────────────────
+function renderStops() {
+  DOM.stopsContainer.innerHTML = '';
+  AppState.stops.forEach((hex, i) => {
+    const el = document.createElement('div');
+    el.className = 'color-stop-item';
+    el.innerHTML = `
+      <div class="color-stop-swatch">
+        <div style="width:100%;height:100%;background:${hex};pointer-events:none"></div>
+        <input type="color" value="${hex}" data-idx="${i}">
+      </div>
+      <input type="text" class="color-stop-hex" value="${hex.toUpperCase()}" data-idx="${i}" maxlength="7" spellcheck="false">
+    `;
+    DOM.stopsContainer.appendChild(el);
   });
-});
 
-// ── Background switcher ───────────────────────────────────
-document.querySelectorAll('.bg-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.bg-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    preview.className = 'minecraft-preview ' + btn.dataset.bg;
+  DOM.stopsContainer.querySelectorAll('input[type="color"]').forEach(inp => {
+    inp.addEventListener('input', e => {
+      AppState.stops[+e.target.dataset.idx] = e.target.value;
+      AppState.isManual = false;
+      renderStops(); updateAll();
+    });
   });
-});
+  DOM.stopsContainer.querySelectorAll('.color-stop-hex').forEach(inp => {
+    inp.addEventListener('change', e => {
+      let val = e.target.value.trim();
+      if(!val.startsWith('#')) val = '#'+val;
+      if(/^#[0-9a-fA-F]{6}$/.test(val)) {
+        AppState.stops[+e.target.dataset.idx] = val;
+        AppState.isManual = false;
+        renderStops(); updateAll();
+      }
+    });
+  });
+  
+  DOM.gradientBar.style.background = `linear-gradient(90deg, ${AppState.stops.join(', ')})`;
+}
 
-// ── Obfuscated animation ──────────────────────────────────
-const OBFUSCATED_CHARS = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789!@#$%^&*()';
-let obfuscationInterval = null;
+// ── Build Codes ───────────────────────────────────────
+function getLegacyFmt() {
+  let s = '';
+  if (AppState.fmt.b) s += '&l';
+  if (AppState.fmt.i) s += '&o';
+  if (AppState.fmt.u) s += '&n';
+  if (AppState.fmt.s) s += '&m';
+  return s;
+}
+function buildMiniMsg() {
+  const chars = [...AppState.text];
+  if(!chars.length) return '';
+  const cols = AppState.stops.map(c=>c.toLowerCase()).join(':');
+  let open = '', close = '';
+  if(AppState.fmt.b) { open += '<bold>'; close = '</bold>' + close; }
+  if(AppState.fmt.i) { open += '<italic>'; close = '</italic>' + close; }
+  if(AppState.fmt.u) { open += '<underline>'; close = '</underline>' + close; }
+  if(AppState.fmt.s) { open += '<strikethrough>'; close = '</strikethrough>' + close; }
+  return `<gradient:${cols}>${open}${AppState.text}${close}</gradient>`;
+}
+function buildCode() {
+  if (!AppState.text.trim()) return '';
+  if (AppState.outFormat === 'minimessage') return buildMiniMsg();
 
-function startObfuscation() {
-  stopObfuscation();
-  obfuscationInterval = setInterval(() => {
+  const chars = [...AppState.text];
+  const colors = getGradientColors(chars.length);
+  const f = getLegacyFmt();
+
+  if (AppState.outFormat === 'hex') {
+    return chars.map((ch, i) => `&#${colors[i].slice(1).toUpperCase()}${f}${ch}`).join('');
+  }
+  if (AppState.outFormat === 'legacy') {
+    return chars.map((ch, i) => {
+      const hex = colors[i].slice(1).toUpperCase();
+      const xCode = '&x' + hex.split('').map(c => `&${c}`).join('');
+      return `${xCode}${f}${ch}`;
+    }).join('');
+  }
+  return '';
+}
+
+// ── Core Updates ──────────────────────────────────────
+let obfTimer = null;
+function updatePreview() {
+  const code = DOM.rawInput.value;
+  if (!code.trim()) {
+    DOM.previewBox.innerHTML = '<span class="placeholder-text">Đang đợi nội dung...</span>';
+    return;
+  }
+  DOM.previewBox.innerHTML = code.split('\n').map(line => {
+    return line ? `<div class="mc-line">${MinecraftParser.parse(line)}</div>` : '<br>';
+  }).join('');
+
+  // Anim obf
+  clearInterval(obfTimer);
+  obfTimer = setInterval(() => {
     document.querySelectorAll('.obfuscated').forEach(el => {
       const len = el.dataset.origLen || el.textContent.length;
       el.dataset.origLen = len;
       let s = '';
-      for (let i = 0; i < len; i++) {
-        s += OBFUSCATED_CHARS[Math.floor(Math.random() * OBFUSCATED_CHARS.length)];
-      }
+      const chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789!@#$%^&*()';
+      for(let i=0; i<len; i++) s += chars[Math.floor(Math.random()*chars.length)];
       el.textContent = s;
     });
   }, 60);
 }
 
-function stopObfuscation() {
-  if (obfuscationInterval) {
-    clearInterval(obfuscationInterval);
-    obfuscationInterval = null;
+function updateAll() {
+  if (!AppState.isManual) {
+    DOM.rawInput.value = buildCode();
   }
+  updatePreview();
 }
 
-// ── Example cards ─────────────────────────────────────────
-document.querySelectorAll('.example-card').forEach(card => {
-  const text = card.dataset.text;
-  const previewDiv = card.querySelector('.example-preview');
-  // Render small preview
-  const html = MinecraftParser.parse(text);
-  previewDiv.innerHTML = html;
+// ── Events ────────────────────────────────────────────
+DOM.plainText.addEventListener('input', e => {
+  AppState.text = e.target.value;
+  AppState.isManual = false;
+  updateAll();
+});
 
-  card.addEventListener('click', () => {
-    input.value = text;
-    doPreview();
-    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+[DOM.fmtB, DOM.fmtI, DOM.fmtU, DOM.fmtS].forEach(cb => {
+  cb.addEventListener('change', () => {
+    AppState.fmt = { b: DOM.fmtB.checked, i: DOM.fmtI.checked, u: DOM.fmtU.checked, s: DOM.fmtS.checked };
+    AppState.isManual = false;
+    updateAll();
   });
 });
 
-// ── Reference tables ──────────────────────────────────────
-function buildLegacyGrid() {
-  const grid = document.getElementById('legacyGrid');
-  const colors = MinecraftParser.LEGACY_COLORS;
-  const names = {
-    '0':'Black','1':'Dark Blue','2':'Dark Green','3':'Dark Aqua','4':'Dark Red',
-    '5':'Dark Purple','6':'Gold','7':'Gray','8':'Dark Gray','9':'Blue',
-    'a':'Green','b':'Aqua','c':'Red','d':'Light Purple','e':'Yellow','f':'White'
-  };
-  let html = '';
-  for (const [code, color] of Object.entries(colors)) {
-    html += `
-      <div class="color-chip" onclick="insertCode('&${code}')" title="Click để chèn &${code}">
-        <div class="color-swatch" style="background:${color}"></div>
-        <div class="color-info">
-          <span class="color-code">&amp;${code}</span>
-          <span class="color-name" style="color:${color}">${names[code]}</span>
-        </div>
-      </div>`;
+DOM.formatSelect.addEventListener('change', e => {
+  AppState.outFormat = e.target.value;
+  AppState.isManual = false; // re-gen code
+  updateAll();
+});
+
+DOM.rawInput.addEventListener('input', () => {
+  AppState.isManual = true; // user is typing raw code
+  updatePreview();
+});
+
+DOM.btnAdd.addEventListener('click', () => {
+  if(AppState.stops.length >= 8) return;
+  const c1 = hexToRgb(AppState.stops[AppState.stops.length-1]);
+  const c2 = hexToRgb(AppState.stops[Math.max(0, AppState.stops.length-2)]);
+  AppState.stops.push(rgbToHex(lerp(c1,c2,0.5)));
+  AppState.isManual = false;
+  renderStops(); updateAll();
+});
+
+DOM.btnRem.addEventListener('click', () => {
+  if(AppState.stops.length <= 2) return;
+  AppState.stops.pop();
+  AppState.isManual = false;
+  renderStops(); updateAll();
+});
+
+DOM.btnRand.addEventListener('click', () => {
+  const randHex = () => '#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0');
+  for(let i=0; i<AppState.stops.length; i++) AppState.stops[i] = randHex();
+  AppState.isManual = false;
+  renderStops(); updateAll();
+});
+
+DOM.copyBtn.addEventListener('click', () => {
+  navigator.clipboard.writeText(DOM.rawInput.value).then(() => {
+    const o = DOM.copyBtn.innerHTML;
+    DOM.copyBtn.innerHTML = '✓ Đã Copy';
+    DOM.copyBtn.classList.add('copied');
+    setTimeout(() => { DOM.copyBtn.innerHTML = o; DOM.copyBtn.classList.remove('copied'); }, 1500);
+  });
+});
+
+DOM.clearBtn.addEventListener('click', () => {
+  DOM.plainText.value = '';
+  DOM.rawInput.value = '';
+  AppState.text = '';
+  AppState.isManual = true;
+  updateAll();
+});
+
+// Bg Switcher
+DOM.bgBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    DOM.bgBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    DOM.previewContainer.className = 'card preview-section bg-' + btn.dataset.bg;
+  });
+});
+
+// Example cards
+document.querySelectorAll('.example-card').forEach(card => {
+  const text = card.dataset.text;
+  card.querySelector('.example-preview').innerHTML = MinecraftParser.parse(text);
+  card.addEventListener('click', () => {
+    DOM.rawInput.value = text;
+    AppState.isManual = true; // Override gradient builder
+    updatePreview();
+    DOM.rawInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+});
+
+// Reference tables (build via old functions that we preserve in parser or inline here)
+// ... keeping it simple for the compact version ...
+// Build tables dynamically:
+function initTables() {
+  const leg = document.getElementById('legacyGrid');
+  if(leg) {
+    let html = '';
+    const cols = MinecraftParser.LEGACY_COLORS;
+    for(let c in cols) html += `<div class="color-chip" onclick="insertRaw('&${c}')"><div class="color-swatch" style="background:${cols[c]}"></div>&amp;${c}</div>`;
+    leg.innerHTML = html;
   }
-  grid.innerHTML = html;
+}
+function insertRaw(code) {
+  const i = DOM.rawInput;
+  const start = i.selectionStart;
+  i.value = i.value.slice(0,start) + code + i.value.slice(i.selectionEnd);
+  i.selectionStart = i.selectionEnd = start + code.length;
+  AppState.isManual = true;
+  updatePreview();
+  i.focus();
 }
 
-function buildMiniTable() {
-  const table = document.getElementById('miniTable');
-  const entries = [
-    ['<red>', '#FF5555'], ['<green>', '#55FF55'], ['<yellow>', '#FFFF55'],
-    ['<blue>', '#5555FF'], ['<aqua>', '#55FFFF'], ['<gold>', '#FFAA00'],
-    ['<white>', '#FFFFFF'], ['<gray>', '#AAAAAA'], ['<dark_red>', '#AA0000'],
-    ['<dark_green>', '#00AA00'], ['<dark_aqua>', '#00AAAA'], ['<dark_blue>', '#0000AA'],
-    ['<dark_purple>', '#AA00AA'], ['<light_purple>', '#FF55FF'], ['<dark_gray>', '#555555'],
-    ['<black>', '#000000'],
-  ];
-  let html = '<table><thead><tr><th>Tag</th><th>Kết quả</th><th></th></tr></thead><tbody>';
-  for (const [tag, color] of entries) {
-    html += `<tr>
-      <td><code>${tag.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</code></td>
-      <td style="color:${color};font-weight:bold">■ ${tag.replace(/<|>/g,'')}</td>
-      <td><button class="insert-btn" onclick="insertCode('${tag}')">Chèn</button></td>
-    </tr>`;
-  }
-  html += '</tbody></table>';
-  table.innerHTML = html;
-}
-
-function buildFormatTable() {
-  const table = document.getElementById('formatTable');
-  const entries = [
-    ['&l', '<b>', 'Bold (đậm)', 'bold'],
-    ['&o', '<i>', 'Italic (nghiêng)', 'italic'],
-    ['&n', '<u>', 'Underline (gạch chân)', 'underline'],
-    ['&m', '<s>', 'Strikethrough (gạch ngang)', 'strikethrough'],
-    ['&k', '<obf>', 'Obfuscated (ẩn)', 'obfuscated'],
-    ['&r', '<reset>', 'Reset về mặc định', 'reset'],
-  ];
-  let html = '<table><thead><tr><th>Legacy</th><th>MiniMessage</th><th>Mô tả</th><th>Ví dụ</th><th></th></tr></thead><tbody>';
-  for (const [leg, mini, desc] of entries) {
-    const sample = leg === '&r' ? '&r' :
-                   leg === '&k' ? '' : // skip obfuscated sample
-                   `${leg}Chữ mẫu`;
-    const sampleHtml = sample ? MinecraftParser.parse(`&f${leg}Chữ mẫu`) : '<span class="obfuscated">????</span>';
-    html += `<tr>
-      <td><code>${leg}</code></td>
-      <td><code>${mini.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</code></td>
-      <td>${desc}</td>
-      <td class="sample-cell">${sampleHtml}</td>
-      <td><button class="insert-btn" onclick="insertCode('${leg}')">Chèn</button></td>
-    </tr>`;
-  }
-  html += '</tbody></table>';
-  table.innerHTML = html;
-}
-
-function insertCode(code) {
-  const start = input.selectionStart;
-  const end = input.selectionEnd;
-  const val = input.value;
-  input.value = val.slice(0, start) + code + val.slice(end);
-  input.selectionStart = input.selectionEnd = start + code.length;
-  input.focus();
-  doPreview();
-}
-
-// ── Tabs ──────────────────────────────────────────────────
+// Tabs
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -200,319 +293,7 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
-// ── Init ──────────────────────────────────────────────────
-buildLegacyGrid();
-buildMiniTable();
-buildFormatTable();
-
-// Start obfuscation on example cards
-startObfuscation();
-
-// ══════════════════════════════════════════════════════════
-//  GRADIENT BUILDER
-// ══════════════════════════════════════════════════════════
-
-const GB = (() => {
-
-  // ── State ─────────────────────────────────────────────
-  let stops = ['#ff0000', '#ffaa00', '#00ff88'];
-  let currentFmt = 'hex'; // 'hex' | 'minimessage' | 'legacy'
-
-  // ── DOM refs ──────────────────────────────────────────
-  const gbText    = document.getElementById('gbText');
-  const gbStops   = document.getElementById('gbStops');
-  const gbBar     = document.getElementById('gbBar');
-  const gbPreview = document.getElementById('gbPreview');
-  const gbOutputs = document.getElementById('gbOutputs');
-  const gbBold    = document.getElementById('gbBold');
-  const gbItalic  = document.getElementById('gbItalic');
-  const gbUnder   = document.getElementById('gbUnder');
-  const gbStrike  = document.getElementById('gbStrike');
-
-  // ── Helpers ───────────────────────────────────────────
-  function hexToRgb(hex) {
-    const h = hex.replace('#', '');
-    return {
-      r: parseInt(h.slice(0,2), 16),
-      g: parseInt(h.slice(2,4), 16),
-      b: parseInt(h.slice(4,6), 16),
-    };
-  }
-
-  function rgbToHex({ r, g, b }) {
-    return '#' + [r, g, b].map(v => v.toString(16).padStart(2,'0')).join('');
-  }
-
-  function lerpRgb(a, b, t) {
-    return {
-      r: Math.round(a.r + (b.r - a.r) * t),
-      g: Math.round(a.g + (b.g - a.g) * t),
-      b: Math.round(a.b + (b.b - a.b) * t),
-    };
-  }
-
-  // Generate `count` colors interpolated across stops[]
-  function getGradientColors(count) {
-    if (count <= 0) return [];
-    if (count === 1) return [stops[0]];
-    const colors = [];
-    const segs = stops.length - 1;
-    for (let i = 0; i < count; i++) {
-      const t = i / (count - 1);
-      const seg = Math.min(Math.floor(t * segs), segs - 1);
-      const tSeg = t * segs - seg;
-      colors.push(rgbToHex(lerpRgb(hexToRgb(stops[seg]), hexToRgb(stops[seg + 1]), tSeg)));
-    }
-    return colors;
-  }
-
-  // ── Render stop row ───────────────────────────────────
-  function renderStops() {
-    gbStops.innerHTML = '';
-    stops.forEach((hex, idx) => {
-      const div = document.createElement('div');
-      div.className = 'gb-stop';
-      div.innerHTML = `
-        <div class="gb-stop-swatch" title="Click để chọn màu">
-          <div class="gb-stop-swatch-bg" style="background:${hex}"></div>
-          <input type="color" value="${hex}" data-idx="${idx}" class="gb-color-input">
-        </div>
-        <input type="text" class="gb-stop-hex" value="${hex.toUpperCase()}" data-idx="${idx}" maxlength="7" spellcheck="false">
-      `;
-      gbStops.appendChild(div);
-    });
-
-    // color picker events
-    gbStops.querySelectorAll('.gb-color-input').forEach(inp => {
-      inp.addEventListener('input', e => {
-        const idx = +e.target.dataset.idx;
-        stops[idx] = e.target.value;
-        // sync swatch bg + hex text
-        const stop = e.target.closest('.gb-stop');
-        stop.querySelector('.gb-stop-swatch-bg').style.background = e.target.value;
-        stop.querySelector('.gb-stop-hex').value = e.target.value.toUpperCase();
-        update();
-      });
-    });
-
-    // hex text input events
-    gbStops.querySelectorAll('.gb-stop-hex').forEach(inp => {
-      inp.addEventListener('input', e => {
-        let val = e.target.value.trim();
-        if (!val.startsWith('#')) val = '#' + val;
-        if (/^#[0-9a-fA-F]{6}$/.test(val)) {
-          const idx = +e.target.dataset.idx;
-          stops[idx] = val;
-          const stop = e.target.closest('.gb-stop');
-          stop.querySelector('.gb-stop-swatch-bg').style.background = val;
-          stop.querySelector('.gb-color-input').value = val;
-          update();
-        }
-      });
-    });
-  }
-
-  // ── Gradient bar ──────────────────────────────────────
-  function renderBar() {
-    gbBar.style.background =
-      `linear-gradient(90deg, ${stops.join(', ')})`;
-  }
-
-  // ── Format codes ──────────────────────────────────────
-  function getFormats() {
-    return {
-      bold:   gbBold.checked,
-      italic: gbItalic.checked,
-      under:  gbUnder.checked,
-      strike: gbStrike.checked,
-    };
-  }
-
-  function legacyFormatCodes(f) {
-    let s = '';
-    if (f.bold)   s += '&l';
-    if (f.italic) s += '&o';
-    if (f.under)  s += '&n';
-    if (f.strike) s += '&m';
-    return s;
-  }
-
-  function miniFormatOpen(f) {
-    let s = '';
-    if (f.bold)   s += '<bold>';
-    if (f.italic) s += '<italic>';
-    if (f.under)  s += '<underline>';
-    if (f.strike) s += '<strikethrough>';
-    return s;
-  }
-  function miniFormatClose(f) {
-    let s = '';
-    if (f.strike) s += '</strikethrough>';
-    if (f.under)  s += '</underline>';
-    if (f.italic) s += '</italic>';
-    if (f.bold)   s += '</bold>';
-    return s;
-  }
-
-  // Build output code string
-  function buildCode(text, fmt) {
-    const f = getFormats();
-    const chars = [...text]; // unicode-safe split
-    if (chars.length === 0) return '';
-
-    if (fmt === 'minimessage') {
-      // <gradient:#c1:#c2:...><bold>text</bold></gradient>
-      const colStr = stops.map(c => c.toLowerCase()).join(':');
-      return `<gradient:${colStr}>${miniFormatOpen(f)}${text}${miniFormatClose(f)}</gradient>`;
-    }
-
-    const colors = getGradientColors(chars.length);
-    const fmtCode = legacyFormatCodes(f);
-
-    if (fmt === 'hex') {
-      // &#RRGGBB per character
-      return chars.map((ch, i) => `&#${colors[i].slice(1).toUpperCase()}${fmtCode}${ch}`).join('');
-    }
-
-    if (fmt === 'legacy') {
-      // &x&R&R&G&G&B&B format (used by some plugins like CMI, EssentialsX)
-      return chars.map((ch, i) => {
-        const hex = colors[i].slice(1).toUpperCase();
-        const xCode = '&x' + hex.split('').map(c => `&${c}`).join('');
-        return `${xCode}${fmtCode}${ch}`;
-      }).join('');
-    }
-
-    return '';
-  }
-
-  // ── Preview render ────────────────────────────────────
-  function renderPreview() {
-    const text = gbText.value;
-    if (!text.trim()) {
-      gbPreview.innerHTML = '<span style="color:#444;font-style:italic;font-size:0.85rem">Preview sẽ hiện ở đây...</span>';
-      return;
-    }
-
-    const chars = [...text];
-    const colors = getGradientColors(chars.length);
-    const f = getFormats();
-
-    const html = chars.map((ch, i) => {
-      let style = `color:${colors[i]};`;
-      if (f.bold)   style += 'font-weight:bold;';
-      if (f.italic) style += 'font-style:italic;';
-      let deco = [];
-      if (f.under)  deco.push('underline');
-      if (f.strike) deco.push('line-through');
-      if (deco.length) style += `text-decoration:${deco.join(' ')};`;
-      return `<span style="${style};text-shadow:1px 1px 3px rgba(0,0,0,0.9)">${escapeHtml(ch)}</span>`;
-    }).join('');
-
-    gbPreview.innerHTML = html;
-  }
-
-  function escapeHtml(t) {
-    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
-
-  // ── Output blocks render ──────────────────────────────
-  const FMT_LABELS = {
-    hex:         '&#RRGGBB — Bukkit / Spigot / Paper',
-    minimessage: '<gradient> — MiniMessage / Adventure API',
-    legacy:      '&x codes — CMI / EssentialsX / LuckPerms',
-  };
-
-  function renderOutputs() {
-    const text = gbText.value;
-
-    // Always show all 3 formats
-    const fmts = ['hex', 'minimessage', 'legacy'];
-    gbOutputs.innerHTML = fmts.map(fmt => {
-      const code = text.trim() ? buildCode(text, fmt) : '';
-      const id = `gbOut_${fmt}`;
-      return `
-        <div class="gb-output-block">
-          <div class="gb-output-header">
-            <span class="gb-output-label">${FMT_LABELS[fmt]}</span>
-            <button class="gb-copy-btn" onclick="GB.copyOutput('${fmt}')">📋 Copy</button>
-          </div>
-          <div class="gb-output-code" id="${id}">${escapeHtml(code)}</div>
-        </div>`;
-    }).join('');
-  }
-
-  // ── Copy output ───────────────────────────────────────
-  function copyOutput(fmt) {
-    const text = gbText.value;
-    if (!text.trim()) return;
-    const code = buildCode(text, fmt);
-    navigator.clipboard.writeText(code).then(() => {
-      // find the button and flash it
-      const btn = gbOutputs.querySelector(`[onclick="GB.copyOutput('${fmt}')"]`);
-      if (btn) {
-        btn.textContent = '✓ Copied!';
-        btn.classList.add('copied');
-        setTimeout(() => {
-          btn.innerHTML = '📋 Copy';
-          btn.classList.remove('copied');
-        }, 2000);
-      }
-    });
-  }
-
-  // ── Main update ───────────────────────────────────────
-  function update() {
-    renderBar();
-    renderPreview();
-    renderOutputs();
-  }
-
-  // ── Init ─────────────────────────────────────────────
-  function init() {
-    renderStops();
-    update();
-
-    // Text input
-    gbText.addEventListener('input', update);
-
-    // Format toggles
-    [gbBold, gbItalic, gbUnder, gbStrike].forEach(cb => cb.addEventListener('change', update));
-
-    // Add/remove stop buttons
-    document.getElementById('gbAddStop').addEventListener('click', () => {
-      if (stops.length >= 8) return;
-      // interpolate a new stop between last two
-      const last  = hexToRgb(stops[stops.length - 1]);
-      const prev  = hexToRgb(stops[Math.max(0, stops.length - 2)]);
-      const newC  = rgbToHex(lerpRgb(last, prev, 0.5));
-      stops.push(newC);
-      renderStops();
-      update();
-    });
-
-    document.getElementById('gbRemoveStop').addEventListener('click', () => {
-      if (stops.length <= 2) return;
-      stops.pop();
-      renderStops();
-      update();
-    });
-
-    // Format tab buttons
-    document.querySelectorAll('.gb-fmt-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.gb-fmt-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentFmt = btn.dataset.fmt;
-        // scroll to that format block
-        const el = document.getElementById(`gbOut_${currentFmt}`);
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      });
-    });
-  }
-
-  return { init, copyOutput };
-})();
-
-// Init Gradient Builder
-GB.init();
+// Boot
+renderStops();
+updateAll();
+initTables();

@@ -17,113 +17,70 @@
       <p class="subtitle">Xem trước màu chữ Minecraft · MOD · Plugin · MiniMessage</p>
     </header>
 
-    <!-- Input section -->
-    <div class="input-section card">
-      <div class="input-header">
-        <label for="colorInput">Nhập chuỗi màu:</label>
-        <div class="format-badges">
-          <span class="badge legacy">&amp;a &amp;l</span>
-          <span class="badge hex">&#x23;FF0000</span>
-          <span class="badge mini">&lt;red&gt;</span>
-          <span class="badge gradient">&lt;gradient&gt;</span>
-          <span class="badge placeholder">%var%</span>
+    <!-- 1. Text & Gradient Settings -->
+    <div class="card compact-section">
+      <div class="section-label">1. Văn bản & Tạo Gradient</div>
+      
+      <div class="input-row">
+        <input type="text" id="plainText" class="modern-input" placeholder="Nhập văn bản thường để tự động tạo gradient..." value="Minecraft Color" />
+        
+        <div class="format-toggles">
+          <label class="toggle-btn" title="Bold"><input type="checkbox" id="fmtB"><span>B</span></label>
+          <label class="toggle-btn" title="Italic"><input type="checkbox" id="fmtI"><span>I</span></label>
+          <label class="toggle-btn" title="Underline"><input type="checkbox" id="fmtU"><span style="text-decoration:underline">U</span></label>
+          <label class="toggle-btn" title="Strikethrough"><input type="checkbox" id="fmtS"><span style="text-decoration:line-through">S</span></label>
         </div>
       </div>
-      <textarea
-        id="colorInput"
-        placeholder="Nhập text màu vào đây...&#10;Ví dụ: &#FF0000&l&nHello &aWorld&#10;Hoặc: <gradient:#ff0000:#00ff00>Rainbow Text</gradient>&#10;Hoặc: <lyellow><b>%crate_name%</b></lyellow>"
-        rows="5"
-      ></textarea>
-      <div class="input-actions">
-        <button id="previewBtn" class="btn btn-primary">▶ Preview</button>
+
+      <div class="color-row">
+        <div class="color-controls">
+          <span class="sub-label">Dải màu:</span>
+          <button class="icon-btn" id="btnAddColor" title="Thêm màu">+</button>
+          <button class="icon-btn" id="btnRemoveColor" title="Xoá màu">−</button>
+          <button class="icon-btn random" id="btnRandomColors" title="Màu ngẫu nhiên">🎲 Random</button>
+        </div>
+        <div id="colorStops" class="stops-container">
+          <!-- JS injected -->
+        </div>
+        <div id="gradientBar" class="gradient-bar"></div>
+      </div>
+    </div>
+
+    <!-- 2. Raw Code & Format -->
+    <div class="card compact-section">
+      <div class="section-header-flex">
+        <div class="section-label">2. Mã màu (Copy hoặc tự chỉnh sửa)</div>
+        <select id="formatSelect" class="modern-select">
+          <option value="hex">Bukkit (&#RRGGBB)</option>
+          <option value="minimessage">MiniMessage (&lt;gradient&gt;)</option>
+          <option value="legacy">Legacy (&amp;x...)</option>
+        </select>
+      </div>
+      
+      <textarea id="rawInput" class="modern-textarea" rows="3" placeholder="Mã màu sẽ hiện ở đây. Bạn cũng có thể tự dán mã màu Minecraft vào ô này để xem trước..."></textarea>
+      
+      <div class="action-row">
+        <button id="copyBtn" class="btn btn-primary">📋 Copy Mã</button>
         <button id="clearBtn" class="btn btn-secondary">✕ Xoá</button>
-        <button id="copyBtn" class="btn btn-copy">📋 Copy</button>
       </div>
     </div>
 
-    <!-- Preview section -->
-    <div class="preview-section card">
+    <!-- 3. Preview -->
+    <div class="card preview-section bg-dark" id="previewContainer">
       <div class="preview-header">
-        <span>Preview</span>
+        <span class="preview-title"><span class="pulse-dot"></span> XEM TRƯỚC</span>
         <div class="bg-switcher">
-          <button class="bg-btn active" data-bg="dark">⬛ Dark</button>
-          <button class="bg-btn" data-bg="light">⬜ Light</button>
-          <button class="bg-btn" data-bg="grass">🌿 Grass</button>
+          <button class="bg-btn active" data-bg="dark">⬛</button>
+          <button class="bg-btn" data-bg="light">⬜</button>
+          <button class="bg-btn" data-bg="grass">🌿</button>
         </div>
       </div>
-      <div class="minecraft-preview dark" id="previewBox">
-        <span class="placeholder-text">Nhập text phía trên để xem preview...</span>
-      </div>
-    </div>
-
-    <!-- ══ GRADIENT BUILDER ══ -->
-    <div class="gb-section card" id="gradientBuilder">
-
-      <!-- Title row -->
-      <div class="gb-header">
-        <div class="gb-title-wrap">
-          <span class="gb-icon">✦</span>
-          <div>
-            <div class="gb-title">Gradient Builder</div>
-            <div class="gb-sub">Tạo text gradient — tự sinh mã màu để copy</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Text input + format toggles -->
-      <div class="gb-body">
-        <div class="gb-row">
-          <div class="gb-field" style="flex:1">
-            <label class="gb-label">Nội dung text</label>
-            <input type="text" id="gbText" class="gb-input" placeholder="Nhập chữ cần tô màu gradient..." value="Minecraft Color" />
-          </div>
-        </div>
-
-        <!-- Format toggles: Bold, Italic, Underline, Strikethrough -->
-        <div class="gb-row gb-format-row">
-          <span class="gb-label" style="margin-right:0.4rem">Format:</span>
-          <label class="gb-toggle"><input type="checkbox" id="gbBold"><span class="gb-toggle-btn"><b>B</b></span></label>
-          <label class="gb-toggle"><input type="checkbox" id="gbItalic"><span class="gb-toggle-btn"><i>I</i></span></label>
-          <label class="gb-toggle"><input type="checkbox" id="gbUnder"><span class="gb-toggle-btn" style="text-decoration:underline">U</span></label>
-          <label class="gb-toggle"><input type="checkbox" id="gbStrike"><span class="gb-toggle-btn" style="text-decoration:line-through">S</span></label>
-
-          <div class="gb-divider"></div>
-
-          <span class="gb-label">Output:</span>
-          <div class="gb-format-tabs" id="gbFormatTabs">
-            <button class="gb-fmt-btn active" data-fmt="hex">&#RRGGBB</button>
-            <button class="gb-fmt-btn" data-fmt="minimessage">&lt;gradient&gt;</button>
-            <button class="gb-fmt-btn" data-fmt="legacy">&amp;x codes</button>
-          </div>
-        </div>
-
-        <!-- Color stops -->
-        <div class="gb-row" style="flex-direction:column; gap:0.5rem">
-          <div style="display:flex; align-items:center; gap:0.5rem">
-            <span class="gb-label">Màu gradient</span>
-            <button class="gb-add-btn" id="gbAddStop" title="Thêm màu">+ Thêm màu</button>
-            <button class="gb-add-btn gb-add-btn--del" id="gbRemoveStop" title="Xóa màu cuối">− Xóa</button>
-          </div>
-          <div class="gb-stops" id="gbStops">
-            <!-- stops injected by JS -->
-          </div>
-          <!-- gradient bar preview -->
-          <div class="gb-bar" id="gbBar"></div>
-        </div>
-
-        <!-- Live preview -->
-        <div class="gb-preview-wrap">
-          <div class="gb-preview-text" id="gbPreview">
-            <span style="color:#555; font-style:italic; font-size:0.85rem">Preview sẽ hiện ở đây...</span>
-          </div>
-        </div>
-
-        <!-- Output codes -->
-        <div class="gb-outputs" id="gbOutputs">
-          <!-- output blocks injected by JS -->
-        </div>
+      <div class="preview-bg"></div>
+      <div class="minecraft-preview" id="previewBox">
+        <span class="placeholder-text">Đang đợi nội dung...</span>
       </div>
     </div>
+
 
     <!-- Quick examples -->
     <div class="examples-section card">
