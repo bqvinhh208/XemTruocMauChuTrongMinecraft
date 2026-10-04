@@ -313,7 +313,7 @@ header {
 .example-preview {
   background: transparent; border: none; padding: 0;
   font-family: 'Minecraft', monospace; font-size: 0.8rem; min-height: 2.2em;
-  overflow: hidden; white-space: nowrap; text-overflow: clip; line-height: 1.6; text-shadow: 2px 2px 0 #000;
+  overflow: hidden; white-space: pre-wrap; text-overflow: clip; line-height: 1.6; text-shadow: 2px 2px 0 #000;
 }
 
 /* ── Reference section ──────────────────────────────────── */

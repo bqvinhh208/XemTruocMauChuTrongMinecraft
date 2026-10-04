@@ -305,8 +305,28 @@ const MinecraftParser = (() => {
           }
         }
 
-        // Legacy single char code
+        // &x&R&R&G&G&B&B hex color
         const code = next.toLowerCase();
+        if (code === 'x' && i + 13 < input.length) {
+          let isHex = true;
+          let hexVal = '#';
+          for (let j = 0; j < 6; j++) {
+            const pos = i + 2 + j * 2;
+            if ((input[pos] === '&' || input[pos] === '\u00A7') && /^[0-9A-Fa-f]$/.test(input[pos+1])) {
+              hexVal += input[pos+1];
+            } else {
+              isHex = false;
+              break;
+            }
+          }
+          if (isHex) {
+            color = hexVal;
+            i += 14;
+            continue;
+          }
+        }
+
+        // Legacy single char code
         if (LEGACY_COLORS[code]) {
           color = LEGACY_COLORS[code];
           i += 2;
@@ -398,6 +418,10 @@ const MinecraftParser = (() => {
         if (LEGACY_COLORS[code]) { i += 2; continue; }
         if (code === '#' && i + 7 < text.length && /^[0-9A-Fa-f]{6}$/.test(text.slice(i + 2, i + 8))) {
           i += 8; continue;
+        }
+        if (code === 'x' && i + 13 < text.length) {
+          // Bỏ qua &x&R&R&G&G&B&B
+          i += 14; continue;
         }
       }
       // Skip XML tags inside gradient
