@@ -207,3 +207,312 @@ buildFormatTable();
 
 // Start obfuscation on example cards
 startObfuscation();
+
+// ══════════════════════════════════════════════════════════
+//  GRADIENT BUILDER
+// ══════════════════════════════════════════════════════════
+
+const GB = (() => {
+
+  // ── State ─────────────────────────────────────────────
+  let stops = ['#ff0000', '#ffaa00', '#00ff88'];
+  let currentFmt = 'hex'; // 'hex' | 'minimessage' | 'legacy'
+
+  // ── DOM refs ──────────────────────────────────────────
+  const gbText    = document.getElementById('gbText');
+  const gbStops   = document.getElementById('gbStops');
+  const gbBar     = document.getElementById('gbBar');
+  const gbPreview = document.getElementById('gbPreview');
+  const gbOutputs = document.getElementById('gbOutputs');
+  const gbBold    = document.getElementById('gbBold');
+  const gbItalic  = document.getElementById('gbItalic');
+  const gbUnder   = document.getElementById('gbUnder');
+  const gbStrike  = document.getElementById('gbStrike');
+
+  // ── Helpers ───────────────────────────────────────────
+  function hexToRgb(hex) {
+    const h = hex.replace('#', '');
+    return {
+      r: parseInt(h.slice(0,2), 16),
+      g: parseInt(h.slice(2,4), 16),
+      b: parseInt(h.slice(4,6), 16),
+    };
+  }
+
+  function rgbToHex({ r, g, b }) {
+    return '#' + [r, g, b].map(v => v.toString(16).padStart(2,'0')).join('');
+  }
+
+  function lerpRgb(a, b, t) {
+    return {
+      r: Math.round(a.r + (b.r - a.r) * t),
+      g: Math.round(a.g + (b.g - a.g) * t),
+      b: Math.round(a.b + (b.b - a.b) * t),
+    };
+  }
+
+  // Generate `count` colors interpolated across stops[]
+  function getGradientColors(count) {
+    if (count <= 0) return [];
+    if (count === 1) return [stops[0]];
+    const colors = [];
+    const segs = stops.length - 1;
+    for (let i = 0; i < count; i++) {
+      const t = i / (count - 1);
+      const seg = Math.min(Math.floor(t * segs), segs - 1);
+      const tSeg = t * segs - seg;
+      colors.push(rgbToHex(lerpRgb(hexToRgb(stops[seg]), hexToRgb(stops[seg + 1]), tSeg)));
+    }
+    return colors;
+  }
+
+  // ── Render stop row ───────────────────────────────────
+  function renderStops() {
+    gbStops.innerHTML = '';
+    stops.forEach((hex, idx) => {
+      const div = document.createElement('div');
+      div.className = 'gb-stop';
+      div.innerHTML = `
+        <div class="gb-stop-swatch" title="Click để chọn màu">
+          <div class="gb-stop-swatch-bg" style="background:${hex}"></div>
+          <input type="color" value="${hex}" data-idx="${idx}" class="gb-color-input">
+        </div>
+        <input type="text" class="gb-stop-hex" value="${hex.toUpperCase()}" data-idx="${idx}" maxlength="7" spellcheck="false">
+      `;
+      gbStops.appendChild(div);
+    });
+
+    // color picker events
+    gbStops.querySelectorAll('.gb-color-input').forEach(inp => {
+      inp.addEventListener('input', e => {
+        const idx = +e.target.dataset.idx;
+        stops[idx] = e.target.value;
+        // sync swatch bg + hex text
+        const stop = e.target.closest('.gb-stop');
+        stop.querySelector('.gb-stop-swatch-bg').style.background = e.target.value;
+        stop.querySelector('.gb-stop-hex').value = e.target.value.toUpperCase();
+        update();
+      });
+    });
+
+    // hex text input events
+    gbStops.querySelectorAll('.gb-stop-hex').forEach(inp => {
+      inp.addEventListener('input', e => {
+        let val = e.target.value.trim();
+        if (!val.startsWith('#')) val = '#' + val;
+        if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+          const idx = +e.target.dataset.idx;
+          stops[idx] = val;
+          const stop = e.target.closest('.gb-stop');
+          stop.querySelector('.gb-stop-swatch-bg').style.background = val;
+          stop.querySelector('.gb-color-input').value = val;
+          update();
+        }
+      });
+    });
+  }
+
+  // ── Gradient bar ──────────────────────────────────────
+  function renderBar() {
+    gbBar.style.background =
+      `linear-gradient(90deg, ${stops.join(', ')})`;
+  }
+
+  // ── Format codes ──────────────────────────────────────
+  function getFormats() {
+    return {
+      bold:   gbBold.checked,
+      italic: gbItalic.checked,
+      under:  gbUnder.checked,
+      strike: gbStrike.checked,
+    };
+  }
+
+  function legacyFormatCodes(f) {
+    let s = '';
+    if (f.bold)   s += '&l';
+    if (f.italic) s += '&o';
+    if (f.under)  s += '&n';
+    if (f.strike) s += '&m';
+    return s;
+  }
+
+  function miniFormatOpen(f) {
+    let s = '';
+    if (f.bold)   s += '<bold>';
+    if (f.italic) s += '<italic>';
+    if (f.under)  s += '<underline>';
+    if (f.strike) s += '<strikethrough>';
+    return s;
+  }
+  function miniFormatClose(f) {
+    let s = '';
+    if (f.strike) s += '</strikethrough>';
+    if (f.under)  s += '</underline>';
+    if (f.italic) s += '</italic>';
+    if (f.bold)   s += '</bold>';
+    return s;
+  }
+
+  // Build output code string
+  function buildCode(text, fmt) {
+    const f = getFormats();
+    const chars = [...text]; // unicode-safe split
+    if (chars.length === 0) return '';
+
+    if (fmt === 'minimessage') {
+      // <gradient:#c1:#c2:...><bold>text</bold></gradient>
+      const colStr = stops.map(c => c.toLowerCase()).join(':');
+      return `<gradient:${colStr}>${miniFormatOpen(f)}${text}${miniFormatClose(f)}</gradient>`;
+    }
+
+    const colors = getGradientColors(chars.length);
+    const fmtCode = legacyFormatCodes(f);
+
+    if (fmt === 'hex') {
+      // &#RRGGBB per character
+      return chars.map((ch, i) => `&#${colors[i].slice(1).toUpperCase()}${fmtCode}${ch}`).join('');
+    }
+
+    if (fmt === 'legacy') {
+      // &x&R&R&G&G&B&B format (used by some plugins like CMI, EssentialsX)
+      return chars.map((ch, i) => {
+        const hex = colors[i].slice(1).toUpperCase();
+        const xCode = '&x' + hex.split('').map(c => `&${c}`).join('');
+        return `${xCode}${fmtCode}${ch}`;
+      }).join('');
+    }
+
+    return '';
+  }
+
+  // ── Preview render ────────────────────────────────────
+  function renderPreview() {
+    const text = gbText.value;
+    if (!text.trim()) {
+      gbPreview.innerHTML = '<span style="color:#444;font-style:italic;font-size:0.85rem">Preview sẽ hiện ở đây...</span>';
+      return;
+    }
+
+    const chars = [...text];
+    const colors = getGradientColors(chars.length);
+    const f = getFormats();
+
+    const html = chars.map((ch, i) => {
+      let style = `color:${colors[i]};`;
+      if (f.bold)   style += 'font-weight:bold;';
+      if (f.italic) style += 'font-style:italic;';
+      let deco = [];
+      if (f.under)  deco.push('underline');
+      if (f.strike) deco.push('line-through');
+      if (deco.length) style += `text-decoration:${deco.join(' ')};`;
+      return `<span style="${style};text-shadow:1px 1px 3px rgba(0,0,0,0.9)">${escapeHtml(ch)}</span>`;
+    }).join('');
+
+    gbPreview.innerHTML = html;
+  }
+
+  function escapeHtml(t) {
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ── Output blocks render ──────────────────────────────
+  const FMT_LABELS = {
+    hex:         '&#RRGGBB — Bukkit / Spigot / Paper',
+    minimessage: '<gradient> — MiniMessage / Adventure API',
+    legacy:      '&x codes — CMI / EssentialsX / LuckPerms',
+  };
+
+  function renderOutputs() {
+    const text = gbText.value;
+
+    // Always show all 3 formats
+    const fmts = ['hex', 'minimessage', 'legacy'];
+    gbOutputs.innerHTML = fmts.map(fmt => {
+      const code = text.trim() ? buildCode(text, fmt) : '';
+      const id = `gbOut_${fmt}`;
+      return `
+        <div class="gb-output-block">
+          <div class="gb-output-header">
+            <span class="gb-output-label">${FMT_LABELS[fmt]}</span>
+            <button class="gb-copy-btn" onclick="GB.copyOutput('${fmt}')">📋 Copy</button>
+          </div>
+          <div class="gb-output-code" id="${id}">${escapeHtml(code)}</div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── Copy output ───────────────────────────────────────
+  function copyOutput(fmt) {
+    const text = gbText.value;
+    if (!text.trim()) return;
+    const code = buildCode(text, fmt);
+    navigator.clipboard.writeText(code).then(() => {
+      // find the button and flash it
+      const btn = gbOutputs.querySelector(`[onclick="GB.copyOutput('${fmt}')"]`);
+      if (btn) {
+        btn.textContent = '✓ Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.innerHTML = '📋 Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      }
+    });
+  }
+
+  // ── Main update ───────────────────────────────────────
+  function update() {
+    renderBar();
+    renderPreview();
+    renderOutputs();
+  }
+
+  // ── Init ─────────────────────────────────────────────
+  function init() {
+    renderStops();
+    update();
+
+    // Text input
+    gbText.addEventListener('input', update);
+
+    // Format toggles
+    [gbBold, gbItalic, gbUnder, gbStrike].forEach(cb => cb.addEventListener('change', update));
+
+    // Add/remove stop buttons
+    document.getElementById('gbAddStop').addEventListener('click', () => {
+      if (stops.length >= 8) return;
+      // interpolate a new stop between last two
+      const last  = hexToRgb(stops[stops.length - 1]);
+      const prev  = hexToRgb(stops[Math.max(0, stops.length - 2)]);
+      const newC  = rgbToHex(lerpRgb(last, prev, 0.5));
+      stops.push(newC);
+      renderStops();
+      update();
+    });
+
+    document.getElementById('gbRemoveStop').addEventListener('click', () => {
+      if (stops.length <= 2) return;
+      stops.pop();
+      renderStops();
+      update();
+    });
+
+    // Format tab buttons
+    document.querySelectorAll('.gb-fmt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.gb-fmt-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFmt = btn.dataset.fmt;
+        // scroll to that format block
+        const el = document.getElementById(`gbOut_${currentFmt}`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    });
+  }
+
+  return { init, copyOutput };
+})();
+
+// Init Gradient Builder
+GB.init();

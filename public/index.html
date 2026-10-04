@@ -56,6 +56,75 @@
       </div>
     </div>
 
+    <!-- ══ GRADIENT BUILDER ══ -->
+    <div class="gb-section card" id="gradientBuilder">
+
+      <!-- Title row -->
+      <div class="gb-header">
+        <div class="gb-title-wrap">
+          <span class="gb-icon">✦</span>
+          <div>
+            <div class="gb-title">Gradient Builder</div>
+            <div class="gb-sub">Tạo text gradient — tự sinh mã màu để copy</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Text input + format toggles -->
+      <div class="gb-body">
+        <div class="gb-row">
+          <div class="gb-field" style="flex:1">
+            <label class="gb-label">Nội dung text</label>
+            <input type="text" id="gbText" class="gb-input" placeholder="Nhập chữ cần tô màu gradient..." value="Minecraft Color" />
+          </div>
+        </div>
+
+        <!-- Format toggles: Bold, Italic, Underline, Strikethrough -->
+        <div class="gb-row gb-format-row">
+          <span class="gb-label" style="margin-right:0.4rem">Format:</span>
+          <label class="gb-toggle"><input type="checkbox" id="gbBold"><span class="gb-toggle-btn"><b>B</b></span></label>
+          <label class="gb-toggle"><input type="checkbox" id="gbItalic"><span class="gb-toggle-btn"><i>I</i></span></label>
+          <label class="gb-toggle"><input type="checkbox" id="gbUnder"><span class="gb-toggle-btn" style="text-decoration:underline">U</span></label>
+          <label class="gb-toggle"><input type="checkbox" id="gbStrike"><span class="gb-toggle-btn" style="text-decoration:line-through">S</span></label>
+
+          <div class="gb-divider"></div>
+
+          <span class="gb-label">Output:</span>
+          <div class="gb-format-tabs" id="gbFormatTabs">
+            <button class="gb-fmt-btn active" data-fmt="hex">&#RRGGBB</button>
+            <button class="gb-fmt-btn" data-fmt="minimessage">&lt;gradient&gt;</button>
+            <button class="gb-fmt-btn" data-fmt="legacy">&amp;x codes</button>
+          </div>
+        </div>
+
+        <!-- Color stops -->
+        <div class="gb-row" style="flex-direction:column; gap:0.5rem">
+          <div style="display:flex; align-items:center; gap:0.5rem">
+            <span class="gb-label">Màu gradient</span>
+            <button class="gb-add-btn" id="gbAddStop" title="Thêm màu">+ Thêm màu</button>
+            <button class="gb-add-btn gb-add-btn--del" id="gbRemoveStop" title="Xóa màu cuối">− Xóa</button>
+          </div>
+          <div class="gb-stops" id="gbStops">
+            <!-- stops injected by JS -->
+          </div>
+          <!-- gradient bar preview -->
+          <div class="gb-bar" id="gbBar"></div>
+        </div>
+
+        <!-- Live preview -->
+        <div class="gb-preview-wrap">
+          <div class="gb-preview-text" id="gbPreview">
+            <span style="color:#555; font-style:italic; font-size:0.85rem">Preview sẽ hiện ở đây...</span>
+          </div>
+        </div>
+
+        <!-- Output codes -->
+        <div class="gb-outputs" id="gbOutputs">
+          <!-- output blocks injected by JS -->
+        </div>
+      </div>
+    </div>
+
     <!-- Quick examples -->
     <div class="examples-section card">
       <div class="section-title">⚡ Ví dụ nhanh</div>
