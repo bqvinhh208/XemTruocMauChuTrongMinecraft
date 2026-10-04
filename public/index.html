@@ -10,16 +10,15 @@
   <div class="container">
     <!-- Header -->
     <header>
-      <div class="logo">
-        <span class="pixel-text green">M</span><span class="pixel-text white">ine</span><span class="pixel-text gold">C</span><span class="pixel-text white">raft</span>
-        <span class="pixel-text aqua"> Color</span>
-        <span class="pixel-text yellow"> Preview</span>
+      <div class="logo-wrap">
+        <div class="logo-icon">🎨</div>
+        <span class="logo-title">MC Color Preview</span>
       </div>
-      <p class="subtitle">Xem trước màu chữ Minecraft / MOD Plugin</p>
+      <p class="subtitle">Xem trước màu chữ Minecraft · MOD · Plugin · MiniMessage</p>
     </header>
 
     <!-- Input section -->
-    <div class="input-section">
+    <div class="input-section card">
       <div class="input-header">
         <label for="colorInput">Nhập chuỗi màu:</label>
         <div class="format-badges">
@@ -43,13 +42,13 @@
     </div>
 
     <!-- Preview section -->
-    <div class="preview-section">
+    <div class="preview-section card">
       <div class="preview-header">
-        <span>Preview:</span>
+        <span>Preview</span>
         <div class="bg-switcher">
-          <button class="bg-btn active" data-bg="dark" title="Dark (default)">⬛</button>
-          <button class="bg-btn" data-bg="light" title="Light">⬜</button>
-          <button class="bg-btn" data-bg="grass" title="Grass">🌿</button>
+          <button class="bg-btn active" data-bg="dark">⬛ Dark</button>
+          <button class="bg-btn" data-bg="light">⬜ Light</button>
+          <button class="bg-btn" data-bg="grass">🌿 Grass</button>
         </div>
       </div>
       <div class="minecraft-preview dark" id="previewBox">
@@ -58,8 +57,8 @@
     </div>
 
     <!-- Quick examples -->
-    <div class="examples-section">
-      <h3>📖 Ví dụ nhanh:</h3>
+    <div class="examples-section card">
+      <div class="section-title">⚡ Ví dụ nhanh</div>
       <div class="examples-grid">
         <div class="example-card" data-text="&#FF0000&l&nC&#FF3900&l&nÁ &#FF9C00&l&nN&#FFC500&l&nÓ&#E9E200&l&nC &#9EFF00&l&nV&#6BFF00&l&nU&#37FF00&l&nI &#00FFB6&l&nV&#00DBDB&l&nẺ &#0083FF&l&n:&#004FFF&l&nD">
           <div class="example-preview"></div>
@@ -73,7 +72,7 @@
           <div class="example-preview"></div>
           <span class="example-label">Hex Gradient Tag</span>
         </div>
-        <div class="example-card" data-text="<lyellow><b>%crate_name%</b></lyellow> &7- &aGiải thưởng đặc biệt!">
+        <div class="example-card" data-text="<lyellow><b>%crate_name%</b></lyellow> &7- &aGiải thưởng!">
           <div class="example-preview"></div>
           <span class="example-label">Plugin Tags + Placeholder</span>
         </div>
@@ -97,8 +96,8 @@
     </div>
 
     <!-- Reference table -->
-    <div class="reference-section">
-      <h3>📋 Bảng mã màu:</h3>
+    <div class="reference-section card">
+      <div class="section-title">📋 Bảng mã màu</div>
       <div class="tabs">
         <button class="tab active" data-tab="legacy">Legacy &amp;codes</button>
         <button class="tab" data-tab="minimessage">MiniMessage</button>
