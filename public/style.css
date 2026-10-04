@@ -100,7 +100,7 @@ header {
 .logo-title {
   font-size: 1.3rem; font-weight: 700;
   background: linear-gradient(135deg, #63b3ed, #b794f4);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
   letter-spacing: -0.3px; line-height: 1.2;
 }
 .subtitle { font-size: 0.8rem; color: var(--text-2); font-weight: 500; }
