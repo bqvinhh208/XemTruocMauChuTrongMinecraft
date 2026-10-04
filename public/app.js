@@ -185,11 +185,18 @@ function updatePreview() {
   }, 60);
 }
 
+function autoResizeInput() {
+  const el = DOM.rawInput;
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+
 function updateAll() {
   if (!AppState.isManual) {
     DOM.rawInput.value = buildCode();
   }
   updatePreview();
+  autoResizeInput();
 }
 
 // ── Events ────────────────────────────────────────────
@@ -216,6 +223,7 @@ DOM.formatSelect.addEventListener('change', e => {
 DOM.rawInput.addEventListener('input', () => {
   AppState.isManual = true; // user is typing raw code
   updatePreview();
+  autoResizeInput();
 });
 
 DOM.btnAdd.addEventListener('click', () => {
@@ -275,6 +283,7 @@ document.querySelectorAll('.example-card').forEach(card => {
     DOM.rawInput.value = text;
     AppState.isManual = true; // Override gradient builder
     updatePreview();
+    autoResizeInput();
     DOM.rawInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 });
@@ -377,4 +386,12 @@ document.getElementById('btnTitle')?.addEventListener('click', () => {
   const i = document.getElementById('plainText');
   i.value = i.value.toLowerCase().replace(/(?:^|\s)\S/g, a => a.toUpperCase());
   i.dispatchEvent(new Event('input'));
+});
+
+// Font Switcher
+document.getElementById('fontSelect')?.addEventListener('change', e => {
+  const box = document.getElementById('previewBox');
+  if (box) {
+    box.className = 'minecraft-preview preview-font-' + e.target.value;
+  }
 });

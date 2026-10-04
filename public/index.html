@@ -78,16 +78,23 @@
 
     <!-- 3. Preview -->
     <div class="card preview-section bg-dark" id="previewContainer">
-      <div class="preview-header">
+      <div class="preview-header" style="display:flex; justify-content:space-between; align-items:center;">
         <span class="preview-title"><span class="pulse-dot"></span> XEM TRƯỚC</span>
-        <div class="bg-switcher">
-          <button class="bg-btn active" data-bg="dark">⬛</button>
-          <button class="bg-btn" data-bg="light">⬜</button>
-          <button class="bg-btn" data-bg="grass">🌿</button>
+        <div class="preview-tools" style="display:flex; align-items:center; gap:0.75rem;">
+          <select id="fontSelect" class="modern-select" style="padding: 0.2rem 0.5rem; font-size: 0.75rem; min-width: 120px; background: rgba(5,6,12,0.8);">
+            <option value="mc">Minecraft Font</option>
+            <option value="sans">Sans-Serif</option>
+            <option value="mono">Monospace</option>
+          </select>
+          <div class="bg-switcher">
+            <button class="bg-btn active" data-bg="dark">⬛</button>
+            <button class="bg-btn" data-bg="light">⬜</button>
+            <button class="bg-btn" data-bg="grass">🌿</button>
+          </div>
         </div>
       </div>
       <div class="preview-bg"></div>
-      <div class="minecraft-preview" id="previewBox">
+      <div class="minecraft-preview preview-font-mc" id="previewBox">
         <span class="placeholder-text">Đang đợi nội dung...</span>
       </div>
     </div>
