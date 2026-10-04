@@ -113,6 +113,16 @@ header {
   letter-spacing: -0.3px; line-height: 1.2;
 }
 .subtitle { font-size: 0.8rem; color: var(--text-2); font-weight: 500; }
+.discord-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: #5865F2; color: #fff; font-weight: 600; font-size: 0.8rem;
+  padding: 0.45rem 0.8rem; border-radius: var(--r-sm); text-decoration: none;
+  transition: all 0.2s; box-shadow: 0 4px 14px rgba(88,101,242,0.25);
+  font-family: 'Inter', sans-serif;
+}
+.discord-btn:hover {
+  background: #4752C4; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(88,101,242,0.4); color: #fff;
+}
 
 /* ══════════════════════════════════════════════════════════
    COMPACT EDITOR UI
@@ -317,9 +327,9 @@ header {
 }
 .example-card:hover { border-color: rgba(99,179,237,0.3); background: rgba(99,179,237,0.05); transform: translateY(-2px); }
 .example-preview {
-  background: transparent; border: none; padding: 0;
-  font-family: 'Minecraft', 'VT323', monospace; font-size: 0.95rem; min-height: 2.2em;
-  overflow: hidden; white-space: pre-wrap; text-overflow: clip; line-height: 1.6; text-shadow: 2px 2px 0 #000;
+  background: rgba(5,6,12,0.85); border: 1px solid rgba(255,255,255,0.05); border-radius: 4px; padding: 0.4rem 0.6rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; min-height: 2.2em;
+  overflow: hidden; white-space: pre-wrap; text-overflow: clip; line-height: 1.6; text-shadow: 1px 1px 2px #000;
 }
 
 /* ── Reference section ──────────────────────────────────── */
