@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🎮 Minecraft Color Preview</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="logo">
+        <span class="pixel-text green">M</span><span class="pixel-text white">ine</span><span class="pixel-text gold">C</span><span class="pixel-text white">raft</span>
+        <span class="pixel-text aqua"> Color</span>
+        <span class="pixel-text yellow"> Preview</span>
+      </div>
+      <p class="subtitle">Xem trước màu chữ Minecraft / MOD Plugin</p>
+    </header>
+
+    <!-- Input section -->
+    <div class="input-section">
+      <div class="input-header">
+        <label for="colorInput">Nhập chuỗi màu:</label>
+        <div class="format-badges">
+          <span class="badge legacy">&amp;a &amp;l</span>
+          <span class="badge hex">&#x23;FF0000</span>
+          <span class="badge mini">&lt;red&gt;</span>
+          <span class="badge gradient">&lt;gradient&gt;</span>
+          <span class="badge placeholder">%var%</span>
+        </div>
+      </div>
+      <textarea
+        id="colorInput"
+        placeholder="Nhập text màu vào đây...&#10;Ví dụ: &#FF0000&l&nHello &aWorld&#10;Hoặc: <gradient:#ff0000:#00ff00>Rainbow Text</gradient>&#10;Hoặc: <lyellow><b>%crate_name%</b></lyellow>"
+        rows="5"
+      ></textarea>
+      <div class="input-actions">
+        <button id="previewBtn" class="btn btn-primary">▶ Preview</button>
+        <button id="clearBtn" class="btn btn-secondary">✕ Xoá</button>
+        <button id="copyBtn" class="btn btn-copy">📋 Copy</button>
+      </div>
+    </div>
+
+    <!-- Preview section -->
+    <div class="preview-section">
+      <div class="preview-header">
+        <span>Preview:</span>
+        <div class="bg-switcher">
+          <button class="bg-btn active" data-bg="dark" title="Dark (default)">⬛</button>
+          <button class="bg-btn" data-bg="light" title="Light">⬜</button>
+          <button class="bg-btn" data-bg="grass" title="Grass">🌿</button>
+        </div>
+      </div>
+      <div class="minecraft-preview dark" id="previewBox">
+        <span class="placeholder-text">Nhập text phía trên để xem preview...</span>
+      </div>
+    </div>
+
+    <!-- Quick examples -->
+    <div class="examples-section">
+      <h3>📖 Ví dụ nhanh:</h3>
+      <div class="examples-grid">
+        <div class="example-card" data-text="&#FF0000&l&nC&#FF3900&l&nÁ &#FF9C00&l&nN&#FFC500&l&nÓ&#E9E200&l&nC &#9EFF00&l&nV&#6BFF00&l&nU&#37FF00&l&nI &#00FFB6&l&nV&#00DBDB&l&nẺ &#0083FF&l&n:&#004FFF&l&nD">
+          <div class="example-preview"></div>
+          <span class="example-label">Hex Gradient Bold</span>
+        </div>
+        <div class="example-card" data-text="&a&lGreen Bold &eYellow &cRed &bAqua">
+          <div class="example-preview"></div>
+          <span class="example-label">Legacy Codes</span>
+        </div>
+        <div class="example-card" data-text="<gradient:#ff0000:#ff8800:#ffff00:#00ff00:#0088ff:#8800ff>Rainbow Gradient</gradient>">
+          <div class="example-preview"></div>
+          <span class="example-label">Hex Gradient Tag</span>
+        </div>
+        <div class="example-card" data-text="<lyellow><b>%crate_name%</b></lyellow> &7- &aGiải thưởng đặc biệt!">
+          <div class="example-preview"></div>
+          <span class="example-label">Plugin Tags + Placeholder</span>
+        </div>
+        <div class="example-card" data-text="&l&4[&c!&4] &cCẢNH BÁO &4[&c!&4] &r&cBạn đã bị banned!">
+          <div class="example-preview"></div>
+          <span class="example-label">Warning Message</span>
+        </div>
+        <div class="example-card" data-text="<rainbow>Chào mừng đến với server!</rainbow>">
+          <div class="example-preview"></div>
+          <span class="example-label">Rainbow Tag</span>
+        </div>
+        <div class="example-card" data-text="&#FFD700&l★ &eVIP &6Member &8| &7Rank: &6[&ePlayer&6]">
+          <div class="example-preview"></div>
+          <span class="example-label">Rank Display</span>
+        </div>
+        <div class="example-card" data-text="&8[&b&lServer&8] &7Chào &a%player_name% &7đến server!">
+          <div class="example-preview"></div>
+          <span class="example-label">Join Message</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reference table -->
+    <div class="reference-section">
+      <h3>📋 Bảng mã màu:</h3>
+      <div class="tabs">
+        <button class="tab active" data-tab="legacy">Legacy &amp;codes</button>
+        <button class="tab" data-tab="minimessage">MiniMessage</button>
+        <button class="tab" data-tab="formats">Format codes</button>
+      </div>
+      <div class="tab-content active" id="tab-legacy">
+        <div class="color-grid" id="legacyGrid"></div>
+      </div>
+      <div class="tab-content" id="tab-minimessage">
+        <div class="mini-table" id="miniTable"></div>
+      </div>
+      <div class="tab-content" id="tab-formats">
+        <div class="format-table" id="formatTable"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="parser.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

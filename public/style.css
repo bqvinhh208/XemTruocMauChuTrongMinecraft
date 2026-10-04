@@ -1,0 +1,436 @@
+/* =========================================================
+   Minecraft Color Preview — Style
+   Pixel-dark Minecraft aesthetic
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@400;600&display=swap');
+
+/* ── Reset & Base ───────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --mc-dark:    #1a1a1a;
+  --mc-panel:   #2a2a2a;
+  --mc-border:  #3d3d3d;
+  --mc-border2: #555;
+  --mc-green:   #55FF55;
+  --mc-gold:    #FFAA00;
+  --mc-aqua:    #55FFFF;
+  --mc-yellow:  #FFFF55;
+  --mc-white:   #FFFFFF;
+  --mc-gray:    #AAAAAA;
+  --accent:     #4CAF50;
+  --accent2:    #2196F3;
+  --radius:     6px;
+}
+
+html { font-size: 16px; }
+
+body {
+  background: var(--mc-dark);
+  color: var(--mc-white);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+/* ── Container ──────────────────────────────────────────── */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+header {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  border-bottom: 2px solid var(--mc-border);
+}
+
+.logo {
+  font-family: 'VT323', monospace;
+  font-size: 3rem;
+  text-shadow: 3px 3px 0 #000;
+  letter-spacing: 2px;
+}
+
+.pixel-text.green  { color: var(--mc-green); }
+.pixel-text.white  { color: var(--mc-white); }
+.pixel-text.gold   { color: var(--mc-gold); }
+.pixel-text.aqua   { color: var(--mc-aqua); }
+.pixel-text.yellow { color: var(--mc-yellow); }
+
+.subtitle {
+  color: var(--mc-gray);
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+}
+
+/* ── Input section ──────────────────────────────────────── */
+.input-section {
+  background: var(--mc-panel);
+  border: 2px solid var(--mc-border2);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.input-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.input-header label {
+  font-weight: 600;
+  color: var(--mc-yellow);
+  font-size: 0.95rem;
+}
+
+.format-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-left: auto;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-family: monospace;
+  font-weight: 600;
+}
+.badge.legacy      { background: #3d2200; color: var(--mc-gold); border: 1px solid var(--mc-gold); }
+.badge.hex         { background: #1a2b1a; color: var(--mc-green); border: 1px solid var(--mc-green); }
+.badge.mini        { background: #1a1a3d; color: var(--mc-aqua); border: 1px solid var(--mc-aqua); }
+.badge.gradient    { background: #2d1a2d; color: #FF55FF; border: 1px solid #FF55FF; }
+.badge.placeholder { background: #2d2d1a; color: var(--mc-yellow); border: 1px solid var(--mc-yellow); }
+
+textarea#colorInput {
+  width: 100%;
+  background: #111;
+  border: 1px solid var(--mc-border2);
+  border-radius: var(--radius);
+  color: #e0e0e0;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 0.9rem;
+  padding: 0.75rem;
+  resize: vertical;
+  min-height: 100px;
+  transition: border-color 0.2s;
+}
+
+textarea#colorInput:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(76,175,80,0.2);
+}
+
+textarea#colorInput::placeholder { color: #555; }
+
+.input-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn {
+  padding: 0.5rem 1.25rem;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-primary   { background: #2e7d32; color: #fff; }
+.btn-primary:hover { background: #388e3c; transform: translateY(-1px); }
+
+.btn-secondary { background: #444; color: #ccc; }
+.btn-secondary:hover { background: #555; }
+
+.btn-copy      { background: #1565c0; color: #fff; }
+.btn-copy:hover { background: #1976D2; }
+.btn-copy.copied { background: #2e7d32; }
+
+/* ── Preview section ────────────────────────────────────── */
+.preview-section {
+  background: var(--mc-panel);
+  border: 2px solid var(--mc-border2);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.preview-header {
+  background: #222;
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--mc-border);
+  font-size: 0.85rem;
+  color: var(--mc-gray);
+}
+
+.bg-switcher { display: flex; gap: 0.35rem; }
+
+.bg-btn {
+  background: #333;
+  border: 1px solid #555;
+  border-radius: 4px;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.15s;
+}
+.bg-btn:hover, .bg-btn.active {
+  background: #555;
+  border-color: var(--mc-green);
+}
+
+/* Minecraft preview backgrounds */
+.minecraft-preview {
+  padding: 1.25rem 1.5rem;
+  min-height: 80px;
+  font-family: 'VT323', monospace;
+  font-size: 1.5rem;
+  line-height: 1.6;
+  word-break: break-word;
+  transition: background 0.3s;
+}
+
+.minecraft-preview.dark {
+  background: #111;
+}
+
+.minecraft-preview.light {
+  background: #d0d0d0;
+}
+
+.minecraft-preview.grass {
+  background: #3a3a3a;
+  background-image:
+    repeating-linear-gradient(0deg,rgba(0,80,0,0.08) 0px, rgba(0,80,0,0.08) 1px, transparent 1px, transparent 20px),
+    repeating-linear-gradient(90deg,rgba(0,80,0,0.08) 0px, rgba(0,80,0,0.08) 1px, transparent 1px, transparent 20px);
+}
+
+.mc-line {
+  display: block;
+  min-height: 1.6em;
+}
+
+.placeholder-text {
+  color: #444;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+/* Placeholder highlight */
+.placeholder {
+  background: rgba(255,255,0,0.08);
+  border: 1px dashed rgba(255,255,0,0.3);
+  border-radius: 3px;
+  padding: 0 2px;
+}
+
+/* ── Examples section ───────────────────────────────────── */
+.examples-section h3 {
+  color: var(--mc-yellow);
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.examples-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.example-card {
+  background: var(--mc-panel);
+  border: 1px solid var(--mc-border);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.example-card:hover {
+  border-color: var(--mc-green);
+  background: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.example-preview {
+  background: #111;
+  border-radius: 4px;
+  padding: 0.4rem 0.6rem;
+  font-family: 'VT323', monospace;
+  font-size: 1.1rem;
+  min-height: 2em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.example-label {
+  color: var(--mc-gray);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+/* ── Reference section ──────────────────────────────────── */
+.reference-section h3 {
+  color: var(--mc-yellow);
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.tab {
+  background: #333;
+  border: 1px solid #555;
+  color: #ccc;
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.15s;
+}
+.tab:hover { background: #444; }
+.tab.active { background: #1e3a1e; color: var(--mc-green); border-color: var(--mc-green); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Color grid */
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.5rem;
+}
+
+.color-chip {
+  background: #222;
+  border: 1px solid #444;
+  border-radius: var(--radius);
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.color-chip:hover { border-color: #888; background: #2a2a2a; }
+
+.color-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
+  border: 1px solid #555;
+  flex-shrink: 0;
+}
+
+.color-code {
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: #ccc;
+  display: block;
+}
+.color-name {
+  font-size: 0.75rem;
+  display: block;
+  font-weight: 600;
+}
+
+/* Tables */
+.mini-table table,
+.format-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.mini-table th,
+.format-table th {
+  background: #222;
+  color: var(--mc-yellow);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #444;
+}
+
+.mini-table td,
+.format-table td {
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid #333;
+  vertical-align: middle;
+}
+
+.mini-table tr:hover td,
+.format-table tr:hover td { background: #2a2a2a; }
+
+.sample-cell {
+  font-family: 'VT323', monospace;
+  font-size: 1.2rem;
+}
+
+code {
+  background: #333;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: monospace;
+  color: var(--mc-aqua);
+  font-size: 0.85em;
+}
+
+.insert-btn {
+  background: #1a3a1a;
+  border: 1px solid var(--mc-green);
+  color: var(--mc-green);
+  padding: 2px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: all 0.15s;
+}
+.insert-btn:hover { background: #2a4a2a; }
+
+/* ── Obfuscated animation ────────────────────────────────── */
+.obfuscated {
+  display: inline-block;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #1a1a1a; }
+::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #666; }
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .logo { font-size: 2rem; }
+  .examples-grid { grid-template-columns: 1fr 1fr; }
+  .color-grid { grid-template-columns: 1fr 1fr; }
+  .minecraft-preview { font-size: 1.2rem; }
+}
