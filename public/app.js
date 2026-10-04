@@ -350,3 +350,4 @@ document.querySelectorAll('.tab').forEach(tab => {
 renderStops();
 updateAll();
 initTables();
+
