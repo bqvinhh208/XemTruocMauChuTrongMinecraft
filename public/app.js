@@ -351,3 +351,20 @@ renderStops();
 updateAll();
 initTables();
 
+
+// Text Transform Tools
+document.getElementById('btnUpper')?.addEventListener('click', () => {
+  const i = document.getElementById('plainText');
+  i.value = i.value.toUpperCase();
+  i.dispatchEvent(new Event('input'));
+});
+document.getElementById('btnLower')?.addEventListener('click', () => {
+  const i = document.getElementById('plainText');
+  i.value = i.value.toLowerCase();
+  i.dispatchEvent(new Event('input'));
+});
+document.getElementById('btnTitle')?.addEventListener('click', () => {
+  const i = document.getElementById('plainText');
+  i.value = i.value.toLowerCase().replace(/(?:^|\s)\S/g, a => a.toUpperCase());
+  i.dispatchEvent(new Event('input'));
+});
