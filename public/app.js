@@ -395,3 +395,4 @@ document.getElementById('fontSelect')?.addEventListener('change', e => {
     box.className = 'minecraft-preview preview-font-' + e.target.value;
   }
 });
+
