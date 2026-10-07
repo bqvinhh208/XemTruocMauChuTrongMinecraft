@@ -21,6 +21,7 @@ const DOM = {
 
   formatSelect: document.getElementById('formatSelect'),
   rawInput: document.getElementById('rawInput'),
+  convertBtn: document.getElementById('convertBtn'),
   copyBtn: document.getElementById('copyBtn'),
   clearBtn: document.getElementById('clearBtn'),
 
@@ -204,6 +205,12 @@ DOM.plainText.addEventListener('input', e => {
 DOM.formatSelect.addEventListener('change', e => {
   AppState.outFormat = e.target.value;
   AppState.isManual = false; 
+  
+  if (DOM.convertBtn) {
+    const formatName = e.target.options[e.target.selectedIndex].text.split(' ')[0];
+    DOM.convertBtn.innerHTML = `🔄 Chuyển sang ${formatName}`;
+  }
+
   updateAll();
 });
 
@@ -252,6 +259,25 @@ DOM.clearBtn.addEventListener('click', () => {
   AppState.isManual = true;
   updateAll();
 });
+
+if (DOM.convertBtn) {
+  // Set initial text
+  const initialFormatName = DOM.formatSelect.options[DOM.formatSelect.selectedIndex].text.split(' ')[0];
+  DOM.convertBtn.innerHTML = `🔄 Chuyển sang ${initialFormatName}`;
+
+  DOM.convertBtn.addEventListener('click', () => {
+    const format = DOM.formatSelect.value;
+    const input = DOM.rawInput.value;
+    if (input.trim()) {
+      const converted = MinecraftParser.convertToFormat(input, format);
+      DOM.rawInput.value = converted;
+      AppState.isManual = true;
+      updatePreview();
+      autoResizeInput();
+      showToast('Đã chuyển đổi sang mã ' + format + '!');
+    }
+  });
+}
 
 DOM.bgBtns.forEach(btn => {
   btn.addEventListener('click', () => {

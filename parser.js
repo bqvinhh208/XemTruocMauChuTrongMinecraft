@@ -448,6 +448,101 @@ const MinecraftParser = (() => {
     return null;
   }
 
+  const HEX_TO_LEGACY = Object.fromEntries(Object.entries(LEGACY_COLORS).map(([k,v]) => [v.toLowerCase(), '&' + k]));
+  const HEX_TO_MINI = {};
+  for (let k in MINI_COLORS) {
+    HEX_TO_MINI[MINI_COLORS[k].toLowerCase()] = '<' + k + '>';
+  }
+
+  function rgbToHexStr(rgb) {
+    if (!rgb) return null;
+    if (rgb.startsWith('#')) return rgb;
+    const m = rgb.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    if (m) {
+        return '#' + [m[1], m[2], m[3]].map(x => parseInt(x).toString(16).padStart(2, '0')).join('');
+    }
+    return null;
+  }
+
+  function convertToFormat(input, target) {
+    const lines = input.split('\n');
+    const outLines = lines.map(line => {
+        if (!line) return '';
+        const html = parseHybrid(line);
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        
+        let out = '';
+        let lastColor = null;
+        let lastFormats = { bold: false, italic: false, underline: false, strikethrough: false, obfuscated: false };
+
+        function processNode(node) {
+            if (node.nodeType === 3) {
+                if (node.textContent) out += node.textContent;
+            } else if (node.nodeType === 1) {
+                if (node.classList.contains('placeholder')) {
+                    out += node.textContent;
+                    return;
+                }
+                
+                let color = node.style.color ? rgbToHexStr(node.style.color) : lastColor;
+                let formats = { ...lastFormats };
+                if (node.style.fontWeight === 'bold') formats.bold = true;
+                if (node.style.fontStyle === 'italic') formats.italic = true;
+                if (node.style.textDecoration.includes('underline')) formats.underline = true;
+                if (node.style.textDecoration.includes('line-through')) formats.strikethrough = true;
+                if (node.classList.contains('obfuscated')) formats.obfuscated = true;
+
+                let prefix = '';
+                let needsReset = false;
+                for (let k in formats) {
+                    if (lastFormats[k] && !formats[k]) needsReset = true;
+                }
+
+                if (needsReset) {
+                    prefix += (target === 'minimessage') ? '<reset>' : '&r';
+                    lastColor = null;
+                    lastFormats = { bold: false, italic: false, underline: false, strikethrough: false, obfuscated: false };
+                }
+
+                if (color !== lastColor && color) {
+                    const colorLower = color.toLowerCase();
+                    if (target === 'minimessage') {
+                        if (HEX_TO_MINI[colorLower]) prefix += HEX_TO_MINI[colorLower];
+                        else prefix += `<${color}>`;
+                    } else if (target === 'legacy') {
+                        if (HEX_TO_LEGACY[colorLower]) prefix += HEX_TO_LEGACY[colorLower];
+                        else prefix += '&x' + color.slice(1).split('').map(c => '&' + c.toUpperCase()).join('');
+                    } else if (target === 'hex') {
+                        if (HEX_TO_LEGACY[colorLower]) prefix += HEX_TO_LEGACY[colorLower];
+                        else prefix += `&#${color.slice(1).toUpperCase()}`;
+                    }
+                    lastColor = color;
+                }
+
+                for (let k in formats) {
+                    if (formats[k] && !lastFormats[k]) {
+                        if (target === 'minimessage') {
+                            const m = { bold: '<bold>', italic: '<italic>', underline: '<underline>', strikethrough: '<strikethrough>', obfuscated: '<obf>' };
+                            prefix += m[k];
+                        } else {
+                            const m = { bold: '&l', italic: '&o', underline: '&n', strikethrough: '&m', obfuscated: '&k' };
+                            prefix += m[k];
+                        }
+                        lastFormats[k] = true;
+                    }
+                }
+
+                if (prefix) out += prefix;
+                for (let child of node.childNodes) processNode(child);
+            }
+        }
+        for (let child of div.childNodes) processNode(child);
+        return out;
+    });
+    return outLines.join('\n');
+  }
+
   return {
     parse,
     LEGACY_COLORS,
@@ -455,5 +550,6 @@ const MinecraftParser = (() => {
     PLUGIN_COLORS,
     rainbowColors,
     interpolateGradient,
+    convertToFormat
   };
 })();
