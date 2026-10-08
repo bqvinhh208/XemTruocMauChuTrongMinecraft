@@ -204,14 +204,15 @@ DOM.plainText.addEventListener('input', e => {
 
 DOM.formatSelect.addEventListener('change', e => {
   AppState.outFormat = e.target.value;
-  AppState.isManual = false; 
+  
+  if (!AppState.isManual) {
+    updateAll();
+  }
   
   if (DOM.convertBtn) {
     const formatName = e.target.options[e.target.selectedIndex].text.split(' ')[0];
     DOM.convertBtn.innerHTML = `🔄 Chuyển sang ${formatName}`;
   }
-
-  updateAll();
 });
 
 DOM.rawInput.addEventListener('input', () => {
@@ -260,6 +261,84 @@ DOM.clearBtn.addEventListener('click', () => {
   updateAll();
 });
 
+function reverseEngineerAndSync(input) {
+  const html = MinecraftParser.parse(input);
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  
+  let plainText = '';
+  let colorsUsed = [];
+  let formatsUsed = { b: false, i: false, u: false, s: false };
+  
+  function rgbToHex(rgb) {
+      if(!rgb) return null;
+      if(rgb.startsWith('#')) return rgb;
+      const m = rgb.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+      if(m) return '#' + [m[1], m[2], m[3]].map(x => parseInt(x).toString(16).padStart(2, '0')).join('');
+      return null;
+  }
+
+  let isFirstValidChar = true;
+
+  function processNode(node) {
+      if (node.nodeType === 3) {
+          if (node.textContent) plainText += node.textContent;
+      } else if (node.nodeType === 1) {
+          if (node.classList.contains('placeholder')) {
+              plainText += node.textContent;
+              return;
+          }
+          if (node.tagName.toLowerCase() === 'br') {
+              plainText += ' ';
+          }
+          let c = node.style.color ? rgbToHex(node.style.color) : null;
+          if (c) {
+              if (colorsUsed.length === 0 || colorsUsed[colorsUsed.length - 1] !== c) {
+                  colorsUsed.push(c);
+              }
+          }
+          
+          if (isFirstValidChar && node.textContent && node.textContent.trim().length > 0) {
+              if (node.style.fontWeight === 'bold') formatsUsed.b = true;
+              if (node.style.fontStyle === 'italic') formatsUsed.i = true;
+              if (node.style.textDecoration.includes('underline')) formatsUsed.u = true;
+              if (node.style.textDecoration.includes('line-through')) formatsUsed.s = true;
+              isFirstValidChar = false;
+          }
+          for (let child of node.childNodes) processNode(child);
+      }
+  }
+  for (let child of div.childNodes) processNode(child);
+  
+  let finalColors = ['#ff0000', '#ffffff'];
+  if (colorsUsed.length > 0) {
+      if (colorsUsed.length === 1) {
+          finalColors = [colorsUsed[0], colorsUsed[0]];
+      } else if (colorsUsed.length <= 3) {
+          finalColors = colorsUsed;
+      } else {
+          finalColors = [
+              colorsUsed[0],
+              colorsUsed[Math.floor((colorsUsed.length - 1) / 2)],
+              colorsUsed[colorsUsed.length - 1]
+          ];
+      }
+  }
+
+  if (plainText) AppState.text = plainText.replace(/\n/g, ' ').trim() || 'Minecraft Color';
+  AppState.stops = finalColors;
+  AppState.fmt = formatsUsed;
+  AppState.isManual = false; 
+
+  DOM.plainText.value = AppState.text;
+  DOM.fmtB.checked = AppState.fmt.b;
+  DOM.fmtI.checked = AppState.fmt.i;
+  DOM.fmtU.checked = AppState.fmt.u;
+  DOM.fmtS.checked = AppState.fmt.s;
+  renderStops();
+  updateAll(); 
+}
+
 if (DOM.convertBtn) {
   // Set initial text
   const initialFormatName = DOM.formatSelect.options[DOM.formatSelect.selectedIndex].text.split(' ')[0];
@@ -269,12 +348,8 @@ if (DOM.convertBtn) {
     const format = DOM.formatSelect.value;
     const input = DOM.rawInput.value;
     if (input.trim()) {
-      const converted = MinecraftParser.convertToFormat(input, format);
-      DOM.rawInput.value = converted;
-      AppState.isManual = true;
-      updatePreview();
-      autoResizeInput();
-      showToast('Đã chuyển đổi sang mã ' + format + '!');
+      reverseEngineerAndSync(input);
+      showToast('Đã đồng bộ lên mục 1 và chuyển sang ' + format + '!');
     }
   });
 }
